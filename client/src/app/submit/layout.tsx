@@ -1,28 +1,30 @@
-"use client";
+"use client"
 
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import type React from "react"
+
+import { useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
 
 export default function SubmitLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const router = useRouter();
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const router = useRouter()
 
   useEffect(() => {
     // For now, just check localStorage (mock auth)
-    const loggedIn = localStorage.getItem("mockLoggedIn") === "true";
-    setIsLoggedIn(loggedIn);
+    const loggedIn = localStorage.getItem("mockLoggedIn") === "true"
+    setIsLoggedIn(loggedIn)
 
     if (!loggedIn) {
-      alert("Please log in to submit snippets!");
-      router.push("/login");
+      alert("Please log in to submit snippets!")
+      router.push("/login")
     }
-  }, []);
+  }, [])
 
-  if (!isLoggedIn) return null; // Show nothing while redirecting
+  if (!isLoggedIn) return null // Show nothing while redirecting
 
-  return <>{children}</>;
+  return <>{children}</>
 }
