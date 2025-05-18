@@ -5,12 +5,12 @@ import { Star, ArrowUpRight } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import CodeBlock from "@/components/CodeBlock"
 
-export default function SnippetCard({ snippet }: { snippet: Snippet }) {
+export default function SnippetCard({ snippet }: { snippet: any }) {
   // Get a preview of the code (first 3 lines)
   const codePreview = snippet.code.split("\n").slice(0, 3).join("\n")
 
   return (
-    <Link href={`/snippets/${snippet.id}`}>
+    <Link href={`/snippets/${snippet._id}`}>
       <Card className="snippet-card h-full transition-all duration-300 hover:translate-y-[-2px] overflow-hidden">
         <CardHeader className="pb-2">
           <div className="flex justify-between items-start">
@@ -35,7 +35,7 @@ export default function SnippetCard({ snippet }: { snippet: Snippet }) {
             </div>
           </div>
           <div className="flex flex-wrap gap-1 mt-3">
-            {snippet.tags.map((tag) => (
+            {(snippet.tags as string[]).map((tag: string) => (
               <span key={tag} className="text-xs px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground">
                 #{tag}
               </span>

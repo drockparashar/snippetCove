@@ -1,0 +1,72 @@
+[
+  {
+    "title": "Lazy Load Images with next/image",
+    "language": "TypeScript",
+    "tags": ["nextjs", "image", "lazy-load", "performance"],
+    "code": "import Image from 'next/image';\n\nexport default function LazyImage() {\n  return (\n    <Image\n      src=\"/example.jpg\"\n      alt=\"Descriptive alt text\"\n      width={600}\n      height={400}\n      loading=\"lazy\"\n    />\n  );\n}",
+    "author": "6829d521d8b1ed28287f1ef5"
+  },
+  {
+    "title": "Code-Splitting with Dynamic Imports",
+    "language": "TypeScript",
+    "tags": ["nextjs", "dynamic-import", "performance", "lazy-load"],
+    "code": "import dynamic from 'next/dynamic';\n\nconst HeavyComponent = dynamic(() => import('./HeavyComponent'), {\n  loading: () => <p>Loading...</p>,\n  ssr: false,\n});\n\nexport default function Page() {\n  return <HeavyComponent />;\n}",
+    "author": "6829d521d8b1ed28287f1ef5"
+  },
+  {
+    "title": "Use Intersection Observer to Load on Scroll",
+    "language": "TypeScript",
+    "tags": ["intersection-observer", "lazy-load", "scroll", "performance"],
+    "code": "import { useEffect, useRef, useState } from 'react';\n\nexport default function LazyBox() {\n  const ref = useRef<HTMLDivElement>(null);\n  const [visible, setVisible] = useState(false);\n\n  useEffect(() => {\n    const observer = new IntersectionObserver(([entry]) => {\n      if (entry.isIntersecting) setVisible(true);\n    });\n    if (ref.current) observer.observe(ref.current);\n    return () => observer.disconnect();\n  }, []);\n\n  return <div ref={ref}>{visible ? 'Loaded Content' : '...'}</div>;\n}",
+    "author": "6829d521d8b1ed28287f1ef5"
+  },
+  {
+    "title": "Skip to Content Link for Accessibility",
+    "language": "TypeScript",
+    "tags": ["a11y", "skip-link", "keyboard", "accessibility"],
+    "code": "export default function SkipLink() {\n  return (\n    <a\n      href=\"#main-content\"\n      className=\"absolute left-0 top-0 p-2 bg-white text-blue-600 focus:block\"\n    >\n      Skip to content\n    </a>\n  );\n}",
+    "author": "6829d521d8b1ed28287f1ef5"
+  },
+  {
+    "title": "Keyboard Navigation for Menus",
+    "language": "TypeScript",
+    "tags": ["keyboard", "navigation", "menu", "a11y"],
+    "code": "import { useState } from 'react';\n\nexport default function Menu() {\n  const [focusedIndex, setFocusedIndex] = useState(0);\n  const items = ['Home', 'About', 'Contact'];\n\n  return (\n    <ul role=\"menubar\">\n      {items.map((item, i) => (\n        <li\n          key={item}\n          role=\"menuitem\"\n          tabIndex={focusedIndex === i ? 0 : -1}\n          onKeyDown={(e) => {\n            if (e.key === 'ArrowDown') setFocusedIndex((i + 1) % items.length);\n            if (e.key === 'ArrowUp') setFocusedIndex((i - 1 + items.length) % items.length);\n          }}\n        >\n          {item}\n        </li>\n      ))}\n    </ul>\n  );\n}",
+    "author": "6829d521d8b1ed28287f1ef5"
+  },
+  {
+    "title": "Use ARIA Attributes on Modal",
+    "language": "TypeScript",
+    "tags": ["aria", "modal", "a11y", "dialog"],
+    "code": "export default function Modal({ isOpen }: { isOpen: boolean }) {\n  if (!isOpen) return null;\n  return (\n    <div role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"modal-title\">\n      <h2 id=\"modal-title\">Modal Title</h2>\n      <p>Modal content goes here</p>\n    </div>\n  );\n}",
+    "author": "6829d521d8b1ed28287f1ef5"
+  },
+  {
+    "title": "Trap Focus in Dialog",
+    "language": "TypeScript",
+    "tags": ["focus", "trap", "dialog", "a11y"],
+    "code": "import { useRef, useEffect } from 'react';\n\nexport default function FocusTrapModal({ open }: { open: boolean }) {\n  const ref = useRef<HTMLDivElement>(null);\n\n  useEffect(() => {\n    if (!open || !ref.current) return;\n    const focusable = ref.current.querySelectorAll<HTMLElement>(\n      'a, button, input, textarea, select, [tabindex]'\n    );\n    const first = focusable[0];\n    const last = focusable[focusable.length - 1];\n\n    const trap = (e: KeyboardEvent) => {\n      if (e.key !== 'Tab') return;\n      if (e.shiftKey && document.activeElement === first) {\n        e.preventDefault();\n        last.focus();\n      } else if (!e.shiftKey && document.activeElement === last) {\n        e.preventDefault();\n        first.focus();\n      }\n    };\n\n    document.addEventListener('keydown', trap);\n    return () => document.removeEventListener('keydown', trap);\n  }, [open]);\n\n  return <div ref={ref}>{open && <button>Focusable Element</button>}</div>;\n}",
+    "author": "6829d521d8b1ed28287f1ef5"
+  },
+  {
+    "title": "Accessible Form Labels",
+    "language": "TypeScript",
+    "tags": ["form", "label", "a11y", "input"],
+    "code": "export default function LabeledInput() {\n  return (\n    <div>\n      <label htmlFor=\"email\">Email Address</label>\n      <input type=\"email\" id=\"email\" name=\"email\" />\n    </div>\n  );\n}",
+    "author": "6829d521d8b1ed28287f1ef5"
+  },
+  {
+    "title": "Reduce Motion for Accessibility",
+    "language": "TypeScript",
+    "tags": ["motion", "prefers-reduced-motion", "a11y", "animation"],
+    "code": "const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;\n\nexport function FadeInDiv() {\n  return (\n    <div\n      style={{\n        transition: prefersReducedMotion ? 'none' : 'opacity 0.5s',\n        opacity: 1,\n      }}\n    >\n      Accessible fade-in\n    </div>\n  );\n}",
+    "author": "6829d521d8b1ed28287f1ef5"
+  },
+  {
+    "title": "Memoize Expensive Component with React.memo",
+    "language": "TypeScript",
+    "tags": ["performance", "memo", "react", "optimization"],
+    "code": "import React from 'react';\n\nfunction ExpensiveComponent({ value }: { value: number }) {\n  console.log('Rendering...');\n  return <div>Value: {value}</div>;\n}\n\nexport default React.memo(ExpensiveComponent);",
+    "author": "6829d521d8b1ed28287f1ef5"
+  }
+]

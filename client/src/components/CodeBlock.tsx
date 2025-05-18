@@ -43,6 +43,9 @@ export default function CodeBlock({ code, language, filename = "snippet.js" }: C
   // Pick theme based on current mode
   const syntaxTheme = theme === "dark" ? dracula : prism;
 
+  // Normalize language for SyntaxHighlighter
+  const normalizedLanguage = language.toLowerCase();
+
   return (
     <div className="code-window my-6 group">
       <div className="code-window-header">
@@ -74,7 +77,7 @@ export default function CodeBlock({ code, language, filename = "snippet.js" }: C
 
       <div className="code-window-body overflow-x-auto">
         <SyntaxHighlighter
-          language={language}
+          language={normalizedLanguage}
           style={syntaxTheme}
           showLineNumbers
           customStyle={{ margin: 0, background: "transparent", fontSize: "0.95em", borderRadius: "0.5rem", padding: "1.25rem 1rem" }}

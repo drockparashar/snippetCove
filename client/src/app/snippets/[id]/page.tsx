@@ -1,8 +1,6 @@
 "use client"
 
-import type { Snippet } from "@/lib/mockSnippets";
 import { useEffect, useState } from "react"
-import { mockSnippets } from "@/lib/mockSnippets"
 import CodeBlock from "@/components/CodeBlock"
 import { notFound, useParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -12,27 +10,54 @@ import { Badge } from "@/components/ui/badge"
 
 export default function SnippetDetail() {
   const params = useParams()
-  const [snippet, setSnippet] = useState<Snippet | null>(null)
+  const [snippet, setSnippet] = useState<any | null>(null)
+  const [allSnippets, setAllSnippets] = useState<any[]>([])
   const [copied, setCopied] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (params && typeof params.id === "string") {
-      const foundSnippet = mockSnippets.find((s) => s.id === params.id)
-      if (foundSnippet) {
-        setSnippet(foundSnippet)
-      } else {
-        notFound()
-      }
+      setLoading(true)
+      Promise.all([
+        fetch(`http://localhost:5000/api/snippets/${params.id}`).then(res => {
+          if (!res.ok) throw new Error("Snippet not found")
+          return res.json()
+        }),
+        fetch("http://localhost:5000/api/snippets").then(res => res.json())
+      ])
+        .then(([snippetData, allData]) => {
+          setSnippet(snippetData)
+          setAllSnippets(allData)
+          setLoading(false)
+        })
+        .catch((err) => {
+          setError(err.message)
+          setLoading(false)
+        })
     }
   }, [params])
 
-  if (!snippet) return null
+  if (loading) return (
+    <div className="container mx-auto py-12 px-4 text-center">
+      <div className="inline-block p-3 rounded-full bg-muted mb-4">
+        <ArrowLeft className="h-6 w-6 text-muted-foreground animate-spin" />
+      </div>
+      <h3 className="text-xl font-medium mb-2">Loading snippet...</h3>
+    </div>
+  )
+  if (error || !snippet) return notFound()
 
   const copyToClipboard = async () => {
     await navigator.clipboard.writeText(snippet.code)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
+
+  // Find similar snippets (sharing at least one tag, not itself)
+  const similarSnippets = allSnippets
+    .filter((s) => s._id !== snippet._id && s.tags.some((tag: string) => snippet.tags.includes(tag)))
+    .slice(0, 3)
 
   return (
     <div className="container mx-auto py-12 px-4">
@@ -70,7 +95,7 @@ export default function SnippetDetail() {
               <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">
                 {snippet.language}
               </Badge>
-              {snippet.tags.map((tag) => (
+              {(snippet.tags as string[]).map((tag: string) => (
                 <Badge key={tag} variant="secondary" className="text-muted-foreground">
                   #{tag}
                 </Badge>
@@ -108,7 +133,7 @@ export default function SnippetDetail() {
               <div>
                 <h4 className="text-sm font-medium text-muted-foreground mb-1">Tags</h4>
                 <div className="flex flex-wrap gap-2">
-                  {snippet.tags.map((tag) => (
+                  {(snippet.tags as string[]).map((tag: string) => (
                     <span key={tag} className="text-sm px-2 py-1 rounded-full bg-secondary text-secondary-foreground">
                       #{tag}
                     </span>
@@ -130,22 +155,19 @@ export default function SnippetDetail() {
             <div className="mt-8 pt-6 border-t border-border">
               <h3 className="text-lg font-semibold mb-4">Similar Snippets</h3>
               <div className="space-y-3">
-                {mockSnippets
-                  .filter((s) => s.id !== snippet.id && s.tags.some((tag) => snippet.tags.includes(tag)))
-                  .slice(0, 3)
-                  .map((s) => (
-                    <Link href={`/snippets/${s.id}`} key={s.id}>
-                      <div className="p-3 rounded-lg border border-border/50 hover:border-primary/30 hover:bg-card/80 transition-all duration-300">
-                        <h4 className="font-medium text-sm">{s.title}</h4>
-                        <div className="flex items-center gap-2 mt-1">
-                          <Badge variant="outline" className="text-xs">
-                            {s.language}
-                          </Badge>
-                          <span className="text-xs text-muted-foreground">{s.upvotes} upvotes</span>
-                        </div>
+                {similarSnippets.map((s) => (
+                  <Link href={`/snippets/${s._id}`} key={s._id}>
+                    <div className="p-3 rounded-lg border border-border/50 hover:border-primary/30 hover:bg-card/80 transition-all duration-300">
+                      <h4 className="font-medium text-sm">{s.title}</h4>
+                      <div className="flex items-center gap-2 mt-1">
+                        <Badge variant="outline" className="text-xs">
+                          {s.language}
+                        </Badge>
+                        <span className="text-xs text-muted-foreground">{s.upvotes} upvotes</span>
                       </div>
-                    </Link>
-                  ))}
+                    </div>
+                  </Link>
+                ))}
               </div>
             </div>
           </div>

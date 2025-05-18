@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { mockSnippets } from "@/lib/mockSnippets"
 import SnippetCard from "@/components/SnippetCard"
 import { Input } from "@/components/ui/input"
@@ -11,18 +11,59 @@ import { Badge } from "@/components/ui/badge"
 export default function SnippetsPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null)
+  const [snippets, setSnippets] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const debounceTimeout = useRef<NodeJS.Timeout | null>(null)
 
-  const languages = [...new Set(mockSnippets.map((snippet) => snippet.language))]
+  // Debounced search effect
+  useEffect(() => {
+    setLoading(true)
+    if (debounceTimeout.current) clearTimeout(debounceTimeout.current)
+    debounceTimeout.current = setTimeout(() => {
+      let url = "http://localhost:5000/api/snippets"
+      if (searchTerm.trim()) {
+        url = `http://localhost:5000/api/snippets/search?q=${encodeURIComponent(searchTerm.trim())}`
+      }
+      fetch(url)
+        .then((res) => {
+          if (!res.ok) throw new Error("Failed to fetch snippets")
+          return res.json()
+        })
+        .then((data) => {
+          setSnippets(data)
+          setLoading(false)
+        })
+        .catch((err) => {
+          setError(err.message)
+          setLoading(false)
+        })
+    }, 400)
+    return () => {
+      if (debounceTimeout.current) clearTimeout(debounceTimeout.current)
+    }
+  }, [searchTerm])
 
-  const filteredSnippets = mockSnippets.filter((snippet) => {
-    const matchesSearch =
-      snippet.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      snippet.tags.some((tag) => tag.toLowerCase().includes(searchTerm.toLowerCase()))
+  // Language filter (client-side)
+  const languages = [...new Set(snippets.map((snippet) => snippet.language))]
 
+  const filteredSnippets = snippets.filter((snippet) => {
     const matchesLanguage = selectedLanguage ? snippet.language === selectedLanguage : true
-
-    return matchesSearch && matchesLanguage
+    return matchesLanguage
   })
+
+  // Loading and error states
+  if (error) {
+    return (
+      <div className="container mx-auto py-12 px-4 text-center">
+        <div className="inline-block p-3 rounded-full bg-muted mb-4">
+          <Search className="h-6 w-6 text-destructive" />
+        </div>
+        <h3 className="text-xl font-medium mb-2">Error loading snippets</h3>
+        <p className="text-muted-foreground mb-6">{error}</p>
+      </div>
+    )
+  }
 
   return (
     <div className="container mx-auto py-12 px-4">
@@ -30,7 +71,7 @@ export default function SnippetsPage() {
         <div>
           <h1 className="text-3xl font-bold mb-2">Discover Code Snippets</h1>
           <p className="text-muted-foreground">
-            Browse {mockSnippets.length} snippets across multiple languages and frameworks
+            Browse {snippets.length} snippets across multiple languages and frameworks
           </p>
         </div>
         <Button className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70">
@@ -49,6 +90,9 @@ export default function SnippetsPage() {
               className="pl-10"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
+              type="text"
+              autoComplete="off"
+              onKeyDown={(e) => e.stopPropagation()} // prevent form submit
             />
           </div>
           <div className="flex flex-wrap gap-2">
@@ -91,10 +135,17 @@ export default function SnippetsPage() {
       </div>
 
       {/* Snippet Grid */}
-      {filteredSnippets.length > 0 ? (
+      {loading ? (
+        <div className="text-center py-12">
+          <div className="inline-block p-3 rounded-full bg-muted mb-4">
+            <Search className="h-6 w-6 text-muted-foreground animate-spin" />
+          </div>
+          <h3 className="text-xl font-medium mb-2">Loading snippets...</h3>
+        </div>
+      ) : filteredSnippets.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredSnippets.map((snippet) => (
-            <SnippetCard key={snippet.id} snippet={snippet} />
+            <SnippetCard key={snippet._id} snippet={snippet} />
           ))}
         </div>
       ) : (
