@@ -26,7 +26,7 @@ export default function Navbar() {
               <Code2 className="h-8 w-8 text-white relative" />
             </div>
             <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/80">
-              SnipCove
+              SnippetCove
             </span>
           </Link>
 

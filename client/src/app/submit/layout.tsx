@@ -14,15 +14,24 @@ export default function SubmitLayout({
   const router = useRouter()
 
   useEffect(() => {
-    // For now, just check localStorage (mock auth)
-    const loggedIn = localStorage.getItem("mockLoggedIn") === "true"
-    setIsLoggedIn(loggedIn)
-
-    if (!loggedIn) {
-      alert("Please log in to submit snippets!")
-      router.push("/login")
-    }
-  }, [])
+    // Check for GitHub login by looking for a session cookie (or a backend endpoint)
+    fetch("http://localhost:5000/api/auth/check", {
+      credentials: "include"
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.authenticated) {
+          setIsLoggedIn(true);
+        } else {
+          setIsLoggedIn(false);
+          router.push("/login");
+        }
+      })
+      .catch(() => {
+        setIsLoggedIn(false);
+        router.push("/login");
+      });
+  }, []);
 
   if (!isLoggedIn) return null // Show nothing while redirecting
 

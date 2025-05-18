@@ -18,11 +18,25 @@ export default function SubmitSnippetPage() {
   const [tags, setTags] = useState<string[]>([])
   const router = useRouter()
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    alert("Snippet submitted! (Backend not connected yet)")
-    router.push("/snippets") // Redirect after "submission"
-  }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    // Send snippet to backend with credentials (session cookie)
+    const res = await fetch("http://localhost:5000/api/snippets", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ title, code, language, tags }),
+    });
+    if (res.ok) {
+      // Optionally update UI or state to reflect the new snippet in user's createdSnippets
+      // For now, just redirect
+      router.push("/snippets");
+    } else {
+      const data = await res.json().catch(() => ({}));
+      alert(data?.error || "You must be logged in with GitHub to submit a snippet.");
+      router.push("/login");
+    }
+  };
 
   const addTag = () => {
     if (tag && !tags.includes(tag)) {

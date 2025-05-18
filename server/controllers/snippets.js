@@ -1,4 +1,5 @@
 import Snippet from "../models/Snippet.js";
+import User from "../models/User.js";
 
 export const createSnippet = async (req, res) => {
   const { title, code, language, tags } = req.body;
@@ -11,6 +12,12 @@ export const createSnippet = async (req, res) => {
       author: req.userId,
     });
     await snippet.save();
+    // Add snippet to user's createdSnippets
+    await User.findByIdAndUpdate(
+      req.userId,
+      { $push: { createdSnippets: snippet._id } },
+      { new: true }
+    );
     res.status(201).json(snippet);
   } catch (err) {
     res.status(500).json({ error: "Error creating snippet" });

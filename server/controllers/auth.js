@@ -35,3 +35,48 @@ export const login = async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 };
+
+export const getMe = async (req, res) => {
+  try {
+    let user;
+    if (req.isAuthenticated && req.isAuthenticated()) {
+      user = await User.findById(req.user.id || req.user._id).select(
+        "-password"
+      );
+    } else if (req.userId) {
+      user = await User.findById(req.userId).select("-password");
+    }
+    if (!user) return res.status(401).json({ error: "Not authenticated" });
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+export const saveSnippet = async (req, res) => {
+  try {
+    const userId = req.user?.id || req.user?._id || req.userId;
+    if (!userId) return res.status(401).json({ error: "Not authenticated" });
+    const { snippetId } = req.body;
+    await User.findByIdAndUpdate(userId, {
+      $addToSet: { savedSnippets: snippetId },
+    });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: "Could not save snippet" });
+  }
+};
+
+export const unsaveSnippet = async (req, res) => {
+  try {
+    const userId = req.user?.id || req.user?._id || req.userId;
+    if (!userId) return res.status(401).json({ error: "Not authenticated" });
+    const { snippetId } = req.body;
+    await User.findByIdAndUpdate(userId, {
+      $pull: { savedSnippets: snippetId },
+    });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: "Could not unsave snippet" });
+  }
+};

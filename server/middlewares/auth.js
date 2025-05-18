@@ -6,6 +6,13 @@ dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET;
 
 export const auth = (req, res, next) => {
+  // Passport session-based authentication
+  if (req.isAuthenticated && req.isAuthenticated()) {
+    req.userId = req.user.id || req.user._id;
+    return next();
+  }
+
+  // JWT authentication fallback
   const token = req.header("x-auth-token");
   if (!token) return res.status(401).json({ error: "No token, access denied" });
 
