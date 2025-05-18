@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { mockSnippets } from "@/lib/mockSnippets"
+import { useRouter } from "next/navigation"
 import SnippetCard from "@/components/SnippetCard"
 import { Input } from "@/components/ui/input"
 import { Search, Code2 } from "lucide-react"
@@ -15,6 +15,7 @@ export default function SnippetsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const debounceTimeout = useRef<NodeJS.Timeout | null>(null)
+  const router = useRouter()
 
   // Debounced search effect
   useEffect(() => {
@@ -74,7 +75,10 @@ export default function SnippetsPage() {
             Browse {snippets.length} snippets across multiple languages and frameworks
           </p>
         </div>
-        <Button className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70">
+        <Button
+          className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
+          onClick={() => router.push("/submit")}
+        >
           <Code2 className="mr-2 h-4 w-4" />
           Submit a Snippet
         </Button>
