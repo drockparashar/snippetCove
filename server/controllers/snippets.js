@@ -68,3 +68,76 @@ export const searchSnippets = async (req, res) => {
     res.status(500).json({ error: "Error searching snippets" });
   }
 };
+
+// Controller to get total upvotes for a user's created snippets
+export const getTotalUpvotesByUser = async (req, res) => {
+  const { id } = req.params; // Use 'id' to match the route
+  try {
+    const snippets = await Snippet.find({ author: id });
+    const totalUpvotes = snippets.reduce((sum, s) => sum + (s.upvotes || 0), 0);
+    res.json({ totalUpvotes });
+  } catch (err) {
+    res.status(500).json({ error: "Error fetching upvotes" });
+  }
+};
+
+// Controller to upvote a snippet (requires userId in body)
+export const upvoteSnippet = async (req, res) => {
+  const { snippetId, userId } = req.body;
+  if (!userId) {
+    return res.status(401).json({ error: "User not authenticated" });
+  }
+  if (!snippetId) {
+    return res.status(400).json({ error: "Missing snippetId" });
+  }
+  try {
+    const snippet = await Snippet.findById(snippetId);
+    if (!snippet) {
+      return res.status(404).json({ error: "Snippet not found" });
+    }
+    // Check if user has already upvoted
+    if (snippet.upvotedBy && snippet.upvotedBy.includes(userId)) {
+      return res
+        .status(400)
+        .json({ error: "You have already upvoted this snippet" });
+    }
+    snippet.upvotes += 1;
+    snippet.upvotedBy = snippet.upvotedBy || [];
+    snippet.upvotedBy.push(userId);
+    await snippet.save();
+    res.json(snippet);
+  } catch (err) {
+    res.status(500).json({ error: "Error upvoting snippet" });
+  }
+};
+
+// Controller to remove upvote from a snippet (requires userId in body)
+export const removeUpvoteFromSnippet = async (req, res) => {
+  const { snippetId, userId } = req.body;
+  if (!userId) {
+    return res.status(401).json({ error: "User not authenticated" });
+  }
+  if (!snippetId) {
+    return res.status(400).json({ error: "Missing snippetId" });
+  }
+  try {
+    const snippet = await Snippet.findById(snippetId);
+    if (!snippet) {
+      return res.status(404).json({ error: "Snippet not found" });
+    }
+    // Check if user has upvoted
+    if (!snippet.upvotedBy || !snippet.upvotedBy.includes(userId)) {
+      return res
+        .status(400)
+        .json({ error: "You have not upvoted this snippet" });
+    }
+    snippet.upvotes = Math.max(0, snippet.upvotes - 1);
+    snippet.upvotedBy = snippet.upvotedBy.filter(
+      (uid) => uid.toString() !== userId.toString()
+    );
+    await snippet.save();
+    res.json(snippet);
+  } catch (err) {
+    res.status(500).json({ error: "Error removing upvote" });
+  }
+};

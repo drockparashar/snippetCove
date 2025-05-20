@@ -71,9 +71,6 @@ export default function Navbar() {
                   <DropdownMenuItem asChild>
                     <Link href="/dashboard">Profile</Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/dashboard/settings">Settings</Link>
-                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout} variant="destructive">Logout</DropdownMenuItem>
                 </DropdownMenuContent>

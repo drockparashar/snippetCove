@@ -79,12 +79,16 @@ export default function DashboardPage() {
           Promise.all(createdPromises).then((snippets) => {
             const validSnippets = snippets.filter(Boolean)
             setCreatedSnippets(validSnippets)
-
-            // Calculate total upvotes
-            const upvotes = validSnippets.reduce((total, snippet) => total + (snippet.upvotes || 0), 0)
-            setTotalUpvotes(upvotes)
           })
         }
+
+        // Fetch total upvotes using the new backend route
+        fetch(`http://localhost:5000/api/snippets/user/${userData._id}/upvotes`)
+          .then((res) => res.json())
+          .then((data) => {
+            setTotalUpvotes(data.totalUpvotes || 0)
+          })
+          .catch(() => setTotalUpvotes(0))
 
         setLoading(false)
       })
@@ -220,7 +224,8 @@ export default function DashboardPage() {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="profile">
+        <TabsContent value="profile"
+        className="mx-auto w-full max-w-2xl">
           <ProfileSection
             user={user}
             savedCount={savedSnippets.length}

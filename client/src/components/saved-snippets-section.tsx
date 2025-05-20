@@ -134,7 +134,7 @@ export function SavedSnippetsSection({ snippets, onRemove }: SavedSnippetsSectio
                           View
                         </Button>
                       </Link>
-                      <Button 
+                      {/* <Button 
                         variant="outline" 
                         size="sm" 
                         onClick={() => onRemove(snippet._id)}
@@ -142,7 +142,7 @@ export function SavedSnippetsSection({ snippets, onRemove }: SavedSnippetsSectio
                       >
                         <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                         Remove
-                      </Button>
+                      </Button> */}
                     </div>
                   </div>
                   <div className="mt-1 sm:mt-2 text-[10px] sm:text-xs text-muted-foreground">

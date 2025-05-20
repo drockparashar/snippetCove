@@ -138,12 +138,12 @@ export function MySnippetsSection({ snippets }: MySnippetsSectionProps) {
                           View
                         </Button>
                       </Link>
-                      <Link href={`/edit/${snippet._id}`}>
+                      {/* <Link href={`/edit/${snippet._id}`}>
                         <Button variant="outline" size="sm" className="h-7 sm:h-8 text-[10px] sm:text-xs">
                           <Edit className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                           Edit
                         </Button>
-                      </Link>
+                      </Link> */}
                     </div>
                   </div>
                   <div className="mt-1 sm:mt-2 text-[10px] sm:text-xs text-muted-foreground">

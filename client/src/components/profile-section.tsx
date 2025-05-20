@@ -24,9 +24,8 @@ export function ProfileSection({ user, savedCount, createdCount, totalUpvotes, o
     <Card>
       <CardHeader className="relative p-4 sm:p-6">
         <div className="absolute right-3 top-3 sm:right-6 sm:top-6">
-          <Button variant="outline" size="sm" onClick={onSettingsClick} className="h-8 text-xs sm:text-sm">
-            <Edit className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-            <span className="hidden xs:inline">Edit Profile</span>
+          <Button variant="ghost" size="sm" onClick={onSettingsClick} className="h-8 text-xs sm:text-sm">
+            <Settings className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
           </Button>
         </div>
         <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-center sm:items-start">
@@ -67,7 +66,7 @@ export function ProfileSection({ user, savedCount, createdCount, totalUpvotes, o
       </CardHeader>
       <CardContent className="p-4 sm:p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-          <div>
+          {/* <div>
             <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Account Settings</h3>
             <div className="space-y-3 sm:space-y-4">
               <Button variant="outline" className="w-full justify-start text-xs sm:text-sm h-9 sm:h-10" onClick={onSettingsClick}>
@@ -79,7 +78,7 @@ export function ProfileSection({ user, savedCount, createdCount, totalUpvotes, o
                 {user.githubId ? "Manage GitHub Connection" : "Connect GitHub"}
               </Button>
             </div>
-          </div>
+          </div> */}
           <div>
             <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 mt-4 md:mt-0">Activity Summary</h3>
             <div className="space-y-3 sm:space-y-4">

@@ -45,6 +45,9 @@ export default function SnippetDetail() {
   const [error, setError] = useState<string | null>(null)
   const [isSaved, setIsSaved] = useState(false)
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [upvoting, setUpvoting] = useState(false)
+  const [userId, setUserId] = useState<string | null>(null)
+  const [hasUpvoted, setHasUpvoted] = useState(false)
 
   useEffect(() => {
     if (params && typeof params.id === "string") {
@@ -62,12 +65,16 @@ export default function SnippetDetail() {
           setAllSnippets(allData)
           setLoading(false)
           if (authData.authenticated) {
-            // Check if this snippet is saved by the user
             fetch("http://localhost:5000/api/auth/me", { credentials: "include" })
               .then(res => res.json())
               .then(user => {
                 setIsSaved(user.savedSnippets?.includes(snippetData._id))
+                setUserId(user._id)
+                setHasUpvoted(snippetData.upvotedBy?.includes(user._id))
               })
+          } else {
+            setUserId(null)
+            setHasUpvoted(false)
           }
         })
         .catch((err) => {
@@ -117,6 +124,41 @@ export default function SnippetDetail() {
     else setShowLoginModal(true)
   }
 
+  const handleUpvoteToggle = async () => {
+    if (!userId) {
+      setShowLoginModal(true)
+      return
+    }
+    if (!snippet) return
+    setUpvoting(true)
+    if (!hasUpvoted) {
+      // Upvote
+      const res = await fetch("http://localhost:5000/api/snippets/upvote", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ snippetId: snippet._id, userId })
+      })
+      if (res.ok) {
+        const updated = await res.json()
+        setSnippet({ ...snippet, upvotes: updated.upvotes, upvotedBy: updated.upvotedBy })
+        setHasUpvoted(true)
+      }
+    } else {
+      // Remove upvote
+      const res = await fetch("http://localhost:5000/api/snippets/upvote/remove", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ snippetId: snippet._id, userId })
+      })
+      if (res.ok) {
+        const updated = await res.json()
+        setSnippet({ ...snippet, upvotes: updated.upvotes, upvotedBy: updated.upvotedBy })
+        setHasUpvoted(false)
+      }
+    }
+    setUpvoting(false)
+  }
+
   // Find similar snippets (sharing at least one tag, not itself)
   const similarSnippets = allSnippets
     .filter((s) => s._id !== snippet._id && s.tags.some((tag: string) => snippet.tags.includes(tag)))
@@ -145,14 +187,15 @@ export default function SnippetDetail() {
                     {copied ? <Check className="mr-2 h-4 w-4" /> : <Copy className="mr-2 h-4 w-4" />}
                     {copied ? "Copied!" : "Copy"}
                   </Button>
-                  <Button variant="outline" size="sm">
+                  {/* <Button variant="outline" size="sm">
                     <Share2 className="mr-2 h-4 w-4" />
                     Share
-                  </Button>
+                  </Button> */}
                   <Button variant="outline" size="sm" onClick={isSaved ? handleUnsave : handleSave}>
                     <BookmarkPlus className="mr-2 h-4 w-4" />
                     {isSaved ? "Unsave" : "Save"}
                   </Button>
+                  {/* Upvote button removed, star is now in Snippet Info */}
                 </div>
               </div>
 
@@ -178,10 +221,16 @@ export default function SnippetDetail() {
             <div className="bg-card border border-border/50 rounded-xl p-6 sticky top-24">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-lg font-semibold">Snippet Info</h3>
-                <div className="flex items-center gap-1 text-amber-400">
-                  <Star className="h-5 w-5 fill-amber-400" />
+                <button
+                  className={`flex items-center gap-1 focus:outline-none ${hasUpvoted ? "text-amber-400" : "text-muted-foreground hover:text-amber-400"}`}
+                  onClick={handleUpvoteToggle}
+                  disabled={upvoting}
+                  aria-label={hasUpvoted ? "Remove upvote" : "Upvote"}
+                  style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}
+                >
+                  <Star className={`h-5 w-5 ${hasUpvoted ? "fill-amber-400" : ""}`} />
                   <span className="font-medium">{snippet.upvotes}</span>
-                </div>
+                </button>
               </div>
 
               <div className="space-y-4">
@@ -209,11 +258,11 @@ export default function SnippetDetail() {
                 <div>
                   <h4 className="text-sm font-medium text-muted-foreground mb-1">Added by</h4>
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-secondary overflow-hidden">
+                    {/* <div className="w-8 h-8 rounded-full bg-secondary overflow-hidden">
                       <img src="/api/placeholder/32/32" alt="User avatar" className="w-full h-full object-cover" />
-                    </div>
-                    <span className="font-medium">DevUser123</span>
-                  </div>
+                    </div> */}
+                    <span className="font-medium">{snippet.author?.name || "Unknown"}</span>
+                   </div>
                 </div>
               </div>
 
