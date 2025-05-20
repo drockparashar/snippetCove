@@ -1,7 +1,13 @@
 import Snippet from "../models/Snippet.js";
 import User from "../models/User.js";
+import { validationResult } from "express-validator";
 
 export const createSnippet = async (req, res) => {
+  // Validate input
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ error: errors.array()[0].msg });
+  }
   const { title, code, language, tags } = req.body;
   try {
     const snippet = new Snippet({

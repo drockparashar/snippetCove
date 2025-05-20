@@ -120,7 +120,7 @@ export default function SubmitSnippetPage() {
                     id="language"
                     value={language}
                     onChange={(e) => setLanguage(e.target.value)}
-                    className="w-full h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs"
+                    className="w-full h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs dark:bg-[#18181b] dark:text-white dark:border-[#333]"
                   >
                     <option value="javascript">JavaScript</option>
                     <option value="typescript">TypeScript</option>
