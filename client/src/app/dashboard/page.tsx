@@ -12,6 +12,7 @@ import { MySnippetsSection } from "@/components/my-snippets-section"
 import { SavedSnippetsSection } from "@/components/saved-snippets-section"
 import { StatsSection } from "@/components/stats-section"
 import { SettingsDialog } from "@/components/settings-dialog"
+import { useToast } from "@/components/toast-provider"
 
 interface UserData {
   _id: string
@@ -43,6 +44,7 @@ export default function DashboardPage() {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [totalUpvotes, setTotalUpvotes] = useState(0)
   const router = useRouter()
+  const { showToast } = useToast();
 
   useEffect(() => {
     // Check if user is authenticated
@@ -95,6 +97,7 @@ export default function DashboardPage() {
       .catch((err) => {
         console.error("Error fetching user data:", err)
         setError("Failed to load user data. Please try again later.")
+        showToast("Failed to load user data. Please try again later.", "error")
         setLoading(false)
       })
   }, [router])
@@ -105,9 +108,11 @@ export default function DashboardPage() {
         method: "POST",
         credentials: "include",
       })
-      router.push("/")
+      setUser(null)
+      showToast("Logged out successfully.", "success")
+      router.push("/login")
     } catch (error) {
-      console.error("Error logging out:", error)
+      showToast("Logout failed. Please try again.", "error")
     }
   }
 
@@ -123,6 +128,7 @@ export default function DashboardPage() {
       if (res.ok) {
         // Update the UI by removing the snippet from the saved list
         setSavedSnippets(savedSnippets.filter((snippet) => snippet._id !== snippetId))
+        showToast("Snippet removed from saved.", "success")
 
         // Update user data
         if (user) {
@@ -131,9 +137,11 @@ export default function DashboardPage() {
             savedSnippets: user.savedSnippets.filter((id) => id !== snippetId),
           })
         }
+      } else {
+        showToast("Failed to remove snippet.", "error")
       }
     } catch (error) {
-      console.error("Error removing saved snippet:", error)
+      showToast("Failed to remove snippet.", "error")
     }
   }
 

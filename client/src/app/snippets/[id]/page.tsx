@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { ArrowLeft, Star, Copy, Share2, BookmarkPlus, Check } from "lucide-react"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
+import { useToast } from "@/components/toast-provider"
 
 function LoginModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const params = useParams();
@@ -48,6 +49,7 @@ export default function SnippetDetail() {
   const [upvoting, setUpvoting] = useState(false)
   const [userId, setUserId] = useState<string | null>(null)
   const [hasUpvoted, setHasUpvoted] = useState(false)
+  const { showToast } = useToast();
 
   useEffect(() => {
     if (params && typeof params.id === "string") {
@@ -97,6 +99,7 @@ export default function SnippetDetail() {
   const copyToClipboard = async () => {
     await navigator.clipboard.writeText(snippet.code)
     setCopied(true)
+    showToast("Copied to clipboard!", "success")
     setTimeout(() => setCopied(false), 2000)
   }
 
@@ -108,8 +111,13 @@ export default function SnippetDetail() {
       credentials: "include",
       body: JSON.stringify({ snippetId: snippet._id })
     })
-    if (res.ok) setIsSaved(true)
-    else setShowLoginModal(true)
+    if (res.ok) {
+      setIsSaved(true)
+      showToast("Snippet saved!", "success")
+    } else {
+      setShowLoginModal(true)
+      showToast("You must be logged in to save snippets.", "error")
+    }
   }
 
   const handleUnsave = async () => {
@@ -120,13 +128,19 @@ export default function SnippetDetail() {
       credentials: "include",
       body: JSON.stringify({ snippetId: snippet._id })
     })
-    if (res.ok) setIsSaved(false)
-    else setShowLoginModal(true)
+    if (res.ok) {
+      setIsSaved(false)
+      showToast("Snippet removed from saved.", "success")
+    } else {
+      setShowLoginModal(true)
+      showToast("You must be logged in to unsave snippets.", "error")
+    }
   }
 
   const handleUpvoteToggle = async () => {
     if (!userId) {
       setShowLoginModal(true)
+      showToast("You must be logged in to upvote.", "error")
       return
     }
     if (!snippet) return
@@ -142,6 +156,9 @@ export default function SnippetDetail() {
         const updated = await res.json()
         setSnippet({ ...snippet, upvotes: updated.upvotes, upvotedBy: updated.upvotedBy })
         setHasUpvoted(true)
+        showToast("Upvoted!", "success")
+      } else {
+        showToast("Failed to upvote.", "error")
       }
     } else {
       // Remove upvote
@@ -154,6 +171,9 @@ export default function SnippetDetail() {
         const updated = await res.json()
         setSnippet({ ...snippet, upvotes: updated.upvotes, upvotedBy: updated.upvotedBy })
         setHasUpvoted(false)
+        showToast("Upvote removed.", "success")
+      } else {
+        showToast("Failed to remove upvote.", "error")
       }
     }
     setUpvoting(false)

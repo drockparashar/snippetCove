@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation"
 import { Code, FileCode, Hash, Info } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import CodeBlock from "@/components/CodeBlock"
+import { useToast } from "@/components/toast-provider"
 
 export default function SubmitSnippetPage() {
   const [title, setTitle] = useState("")
@@ -17,9 +18,23 @@ export default function SubmitSnippetPage() {
   const [tag, setTag] = useState("")
   const [tags, setTags] = useState<string[]>([])
   const router = useRouter()
+  const { showToast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Frontend validation
+    if (!title.trim()) {
+      showToast("Title is required.", "error");
+      return;
+    }
+    if (!code.trim()) {
+      showToast("Code is required.", "error");
+      return;
+    }
+    if (tags.length === 0) {
+      showToast("Please add at least one tag.", "error");
+      return;
+    }
     // Send snippet to backend with credentials (session cookie)
     const res = await fetch("http://localhost:5000/api/snippets", {
       method: "POST",
@@ -28,13 +43,11 @@ export default function SubmitSnippetPage() {
       body: JSON.stringify({ title, code, language, tags }),
     });
     if (res.ok) {
-      // Optionally update UI or state to reflect the new snippet in user's createdSnippets
-      // For now, just redirect
+      showToast("Snippet submitted!", "success");
       router.push("/snippets");
     } else {
       const data = await res.json().catch(() => ({}));
-      alert(data?.error || "You must be logged in with GitHub to submit a snippet.");
-      // Redirect to login with redirect param to come back to submit page
+      showToast(data?.error || "You must be logged in with GitHub to submit a snippet.", "error");
       router.push("/login?redirect=/submit");
     }
   };

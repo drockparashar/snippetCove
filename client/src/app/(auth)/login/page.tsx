@@ -2,21 +2,27 @@
 
 import React, { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation"
+import { useToast } from "@/components/toast-provider"
 
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get("redirect");
+  const { showToast } = useToast();
 
   useEffect(() => {
     // Remove mock login check, only rely on real authentication
     // (No redirect on page load)
   }, [redirect, router]);
 
-  const handleGithubLogin = () => {
-    // Pass the redirect param to the backend so it can redirect back after GitHub login
-    const redirectParam = redirect ? `?redirect=${encodeURIComponent(redirect)}` : '';
-    window.location.href = `http://localhost:5000/api/auth/github${redirectParam}`;
+  const handleGithubLogin = async () => {
+    try {
+      // Pass the redirect param to the backend so it can redirect back after GitHub login
+      const redirectParam = redirect ? `?redirect=${encodeURIComponent(redirect)}` : '';
+      window.location.href = `http://localhost:5000/api/auth/github${redirectParam}`;
+    } catch (err) {
+      showToast("GitHub login failed. Please try again.", "error");
+    }
   };
 
   return (
