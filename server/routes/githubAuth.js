@@ -3,20 +3,35 @@ import passport from "passport";
 
 const router = express.Router();
 
-// Start GitHub OAuth
-router.get(
-  "/github",
-  passport.authenticate("github", { scope: ["user:email"] })
-);
+// Start GitHub OAuth with state param for redirect
+router.get("/github", (req, res, next) => {
+  // Pass redirect as state param to GitHub
+  const state = req.query.redirect
+    ? encodeURIComponent(req.query.redirect)
+    : "";
+  passport.authenticate("github", {
+    scope: ["user:email"],
+    state,
+  })(req, res, next);
+});
 
-// GitHub OAuth callback
+// GitHub OAuth callback using state param for redirect
 router.get(
   "/github/callback",
   passport.authenticate("github", { failureRedirect: "/login", session: true }),
   (req, res) => {
-    // Successful authentication
-    // Redirect to frontend login success page
-    res.redirect("http://localhost:3000/submit"); // Change to your frontend URL/route
+    // Use redirect from state param if available
+    let redirectUrl = req.query.state
+      ? decodeURIComponent(req.query.state)
+      : null;
+    if (
+      !redirectUrl ||
+      typeof redirectUrl !== "string" ||
+      !redirectUrl.startsWith("/")
+    ) {
+      redirectUrl = "/snippets";
+    }
+    res.redirect(`http://localhost:3000${redirectUrl}`);
   }
 );
 

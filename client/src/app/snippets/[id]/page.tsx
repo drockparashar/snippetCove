@@ -9,6 +9,7 @@ import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 
 function LoginModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const params = useParams();
   if (!open) return null;
   return (
     <div
@@ -25,7 +26,7 @@ function LoginModal({ open, onClose }: { open: boolean; onClose: () => void }) {
           className="w-full py-2 px-4 rounded bg-primary text-background font-semibold hover:bg-primary/90 transition"
           onClick={() => {
             onClose();
-            window.location.href = "/login";
+            window.location.href = `/login?redirect=/snippets/${params.id}`;
           }}
         >
           Go to Login

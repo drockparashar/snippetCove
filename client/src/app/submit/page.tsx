@@ -34,7 +34,8 @@ export default function SubmitSnippetPage() {
     } else {
       const data = await res.json().catch(() => ({}));
       alert(data?.error || "You must be logged in with GitHub to submit a snippet.");
-      router.push("/login");
+      // Redirect to login with redirect param to come back to submit page
+      router.push("/login?redirect=/submit");
     }
   };
 

@@ -77,7 +77,21 @@ export default function SnippetsPage() {
         </div>
         <Button
           className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
-          onClick={() => router.push("/submit")}
+          onClick={() => {
+            // Check if user is authenticated before redirecting
+            fetch("http://localhost:5000/api/auth/check", { credentials: "include" })
+              .then(res => res.json())
+              .then(data => {
+                if (data.authenticated) {
+                  router.push("/submit");
+                } else {
+                  router.push("/login?redirect=/submit");
+                }
+              })
+              .catch(() => {
+                router.push("/login?redirect=/submit");
+              });
+          }}
         >
           <Code2 className="mr-2 h-4 w-4" />
           Submit a Snippet

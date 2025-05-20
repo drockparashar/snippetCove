@@ -1,24 +1,22 @@
 "use client"
 
-import type React from "react"
-
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { Code2, Lock, Mail } from "lucide-react"
+import React, { useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation"
 
 export default function LoginPage() {
-  const router = useRouter()
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get("redirect");
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    localStorage.setItem("mockLoggedIn", "true") // Mock login
-    router.push("/submit") // Redirect to submit page
-  }
+  useEffect(() => {
+    // Remove mock login check, only rely on real authentication
+    // (No redirect on page load)
+  }, [redirect, router]);
 
   const handleGithubLogin = () => {
-    window.location.href = "http://localhost:5000/api/auth/github";
+    // Pass the redirect param to the backend so it can redirect back after GitHub login
+    const redirectParam = redirect ? `?redirect=${encodeURIComponent(redirect)}` : '';
+    window.location.href = `http://localhost:5000/api/auth/github${redirectParam}`;
   };
 
   return (
