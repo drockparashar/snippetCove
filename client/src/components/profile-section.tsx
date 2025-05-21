@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
-import { BookMarked, Code2, Edit, Github, Mail, Settings, Star } from 'lucide-react'
+import { BookMarked, Code2, Github, Mail, Settings, Star } from 'lucide-react'
 
 interface ProfileSectionProps {
   user: {
@@ -30,11 +30,11 @@ export function ProfileSection({ user, savedCount, createdCount, totalUpvotes, o
         </div>
         <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-center sm:items-start">
           <Avatar className="h-16 w-16 sm:h-24 sm:w-24 border-4 border-background">
-            <AvatarImage src={`/api/placeholder/96/96`} alt={user.name} />
-            <AvatarFallback className="text-xl sm:text-2xl">{user.name.charAt(0)}</AvatarFallback>
+            <AvatarImage src={`/api/placeholder/96/96`} alt={user.name || "User"} />
+            <AvatarFallback className="text-xl sm:text-2xl">{(user.name && user.name.charAt(0)) || "?"}</AvatarFallback>
           </Avatar>
           <div className="text-center sm:text-left">
-            <CardTitle className="text-xl sm:text-2xl">{user.name}</CardTitle>
+            <CardTitle className="text-xl sm:text-2xl">{user.name || "Unknown User"}</CardTitle>
             <CardDescription className="flex items-center justify-center sm:justify-start mt-1">
               <Mail className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
               {user.email}

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { LogOut, Plus, User } from "lucide-react"
+import { Plus, User } from "lucide-react"
 import Link from "next/link"
 import { ProfileSection } from "@/components/profile-section"
 import { MySnippetsSection } from "@/components/my-snippets-section"
@@ -102,48 +102,49 @@ export default function DashboardPage() {
       })
   }, [router])
 
-  const handleLogout = async () => {
-    try {
-      await fetch("http://localhost:5000/api/auth/logout", {
-        method: "POST",
-        credentials: "include",
-      })
-      setUser(null)
-      showToast("Logged out successfully.", "success")
-      router.push("/login")
-    } catch (error) {
-      showToast("Logout failed. Please try again.", "error")
-    }
-  }
+  // const handleLogout = async () => {
+  //   try {
+  //     await fetch("http://localhost:5000/api/auth/logout", {
+  //       method: "POST",
+  //       credentials: "include",
+  //     })
+  //     setUser(null)
+  //     showToast("Logged out successfully.", "success")
+  //     router.push("/login")
+  //   } catch (error) {
+  //     showToast("Logout failed. Please try again.", "error")
+  //   }
+  // }
 
-  const handleRemoveSavedSnippet = async (snippetId: string) => {
-    try {
-      const res = await fetch(`http://localhost:5000/api/auth/unsave-snippet`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ snippetId }),
-      })
+  // const handleRemoveSavedSnippet = async (snippetId: string) => {
+  //   try {
+  //     const res = await fetch(`http://localhost:5000/api/auth/unsave-snippet`, {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       credentials: "include",
+  //       body: JSON.stringify({ snippetId }),
+  //     })
 
-      if (res.ok) {
-        // Update the UI by removing the snippet from the saved list
-        setSavedSnippets(savedSnippets.filter((snippet) => snippet._id !== snippetId))
-        showToast("Snippet removed from saved.", "success")
+  //     if (res.ok) {
+  //       // Update the UI by removing the snippet from the saved list
+  //       setSavedSnippets(savedSnippets.filter((snippet) => snippet._id !== snippetId))
+  //       showToast("Snippet removed from saved.", "success")
 
-        // Update user data
-        if (user) {
-          setUser({
-            ...user,
-            savedSnippets: user.savedSnippets.filter((id) => id !== snippetId),
-          })
-        }
-      } else {
-        showToast("Failed to remove snippet.", "error")
-      }
-    } catch (error) {
-      showToast("Failed to remove snippet.", "error")
-    }
-  }
+  //       // Update user data
+  //       if (user) {
+  //         setUser({
+  //           ...user,
+  //           savedSnippets: user.savedSnippets.filter((id) => id !== snippetId),
+  //         })
+  //       }
+  //     } else {
+  //       showToast("Failed to remove snippet.", "error")
+  //     }
+  //   } catch (error) {
+  //     showToast("Failed to remove snippet.", "error");
+  //     console.log(error);
+  //   }
+  // }
 
   if (loading) {
     return (
@@ -199,10 +200,10 @@ export default function DashboardPage() {
               New Snippet
             </Button>
           </Link>
-          <Button variant="outline" size="sm" className="text-xs md:text-sm" onClick={handleLogout}>
+          {/* <Button variant="outline" size="sm" className="text-xs md:text-sm" onClick={handleLogout}>
             <LogOut className="mr-1 md:mr-2 h-3 w-3 md:h-4 md:w-4" />
             Logout
-          </Button>
+          </Button> */}
         </div>
       </div>
 
@@ -248,7 +249,7 @@ export default function DashboardPage() {
         </TabsContent>
 
         <TabsContent value="saved">
-          <SavedSnippetsSection snippets={savedSnippets} onRemove={handleRemoveSavedSnippet} />
+          <SavedSnippetsSection snippets={savedSnippets} />
         </TabsContent>
 
         <TabsContent value="stats">

@@ -1,11 +1,11 @@
-import type { Snippet } from "@/lib/mockSnippets"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
 import Link from "next/link"
 import { Star, ArrowUpRight } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import CodeBlock from "@/components/CodeBlock"
+import type { Snippet } from "@/lib/mockSnippets"
 
-export default function SnippetCard({ snippet }: { snippet: any }) {
+export default function SnippetCard({ snippet }: { snippet: Snippet }) {
   // Get a preview of the code (first 3 lines)
   const codePreview = snippet.code.split("\n").slice(0, 3).join("\n")
 

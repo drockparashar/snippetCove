@@ -3,7 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Code2, Edit, ExternalLink, Plus, Star } from 'lucide-react'
+import { Code2, ExternalLink, Plus, Star } from 'lucide-react'
 import Link from "next/link"
 import { useState } from "react"
 import { Input } from "@/components/ui/input"
@@ -57,7 +57,7 @@ export function MySnippetsSection({ snippets }: MySnippetsSectionProps) {
       <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 sm:p-6 gap-3 sm:gap-0">
         <div>
           <CardTitle className="text-lg sm:text-xl">My Snippets</CardTitle>
-          <CardDescription className="text-xs sm:text-sm">Code snippets you've created and shared</CardDescription>
+          <CardDescription className="text-xs sm:text-sm">Code snippets you&apos;ve created and shared</CardDescription>
         </div>
         <Link href="/submit">
           <Button size="sm" className="text-xs sm:text-sm h-8 sm:h-9">

@@ -61,41 +61,41 @@ const TypingEffect = ({ messages, className }: TypingEffectProps) => {
 
 const testimonials = [
   {
-    name: "Alex Chen",
-    role: "Frontend Developer",
+    name: "Pranshu Parashar",
+    role: "Software Developer",
     image: "/api/placeholder/40/40",
     content:
       "SnipCove has cut my development time in half. No more hunting through old projects for that one authentication snippet!",
   },
   {
-    name: "Sarah Johnson",
+    name: "Gagan Raghav",
     role: "Full Stack Engineer",
     image: "/api/placeholder/40/40",
     content:
       "The quality of code on SnipCove is outstanding. I've learned better practices just by using snippets from the community.",
   },
   {
-    name: "Miguel Rodriguez",
-    role: "Junior Developer",
+    name: "Chetan Singh",
+    role: "Frontend Developer",
     image: "/api/placeholder/40/40",
     content:
       "As someone new to coding, SnipCove is like having senior devs guide you through common patterns. Invaluable resource!",
   },
 ]
 
-type StatsCounterProps = {
-  value: string | number
-  label: string
-}
+// type StatsCounterProps = {
+//   value: string | number
+//   label: string
+// }
 
-const StatsCounter = ({ value, label }: StatsCounterProps) => {
-  return (
-    <div className="text-center">
-      <div className="text-4xl font-bold text-primary">{value}+</div>
-      <div className="text-sm text-muted-foreground mt-1">{label}</div>
-    </div>
-  )
-}
+// const StatsCounter = ({ value, label }: StatsCounterProps) => {
+//   return (
+//     <div className="text-center">
+//       <div className="text-4xl font-bold text-primary">{value}+</div>
+//       <div className="text-sm text-muted-foreground mt-1">{label}</div>
+//     </div>
+//   )
+// }
 
 export default function LandingPage() {
   return (
@@ -306,19 +306,19 @@ export default function LandingPage() {
             {testimonials.map((testimonial, index) => (
               <div key={index} className="bg-card p-6 rounded-xl border border-border/50">
                 <div className="flex items-center mb-4">
-                  <div className="w-10 h-10 rounded-full overflow-hidden bg-secondary">
+                  {/* <div className="w-10 h-10 rounded-full overflow-hidden bg-secondary">
                     <img
                       src={testimonial.image || "/placeholder.svg"}
                       alt={testimonial.name}
                       className="w-full h-full object-cover"
                     />
-                  </div>
+                  </div> */}
                   <div className="ml-3">
                     <h4 className="font-semibold text-foreground">{testimonial.name}</h4>
                     <p className="text-sm text-muted-foreground">{testimonial.role}</p>
                   </div>
                 </div>
-                <p className="text-foreground/90">"{testimonial.content}"</p>
+                <p className="text-foreground/90">&quot;{testimonial.content}&quot;</p>
                 <div className="mt-4 flex text-amber-400">
                   {[...Array(5)].map((_, i) => (
                     <Star key={i} className="h-4 w-4 fill-current" />

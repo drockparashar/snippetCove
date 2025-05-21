@@ -19,10 +19,17 @@ import { Switch } from "@/components/ui/switch"
 import { Github, Mail, Save, Trash2, User } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
+interface UserProfile {
+  name: string;
+  email: string;
+  githubId?: string;
+  // Add other fields as needed
+}
+
 interface SettingsDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  user: any
+  user: UserProfile
 }
 
 export function SettingsDialog({ open, onOpenChange, user }: SettingsDialogProps) {
@@ -151,7 +158,7 @@ export function SettingsDialog({ open, onOpenChange, user }: SettingsDialogProps
               <div>
                 <h3 className="text-sm sm:text-lg font-semibold mb-1 sm:mb-2">Password</h3>
                 <p className="text-[10px] sm:text-sm text-muted-foreground mb-2 sm:mb-4">
-                  Change your password or set one if you're using social login
+                  Change your password or set one if you&apos;re using social login
                 </p>
                 <Button variant="outline" size="sm" className="text-xs sm:text-sm h-7 sm:h-8">
                   Change Password

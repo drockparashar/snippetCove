@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import CodeBlock from "@/components/CodeBlock"
 import { notFound, useParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, Star, Copy, Share2, BookmarkPlus, Check } from "lucide-react"
+import { ArrowLeft, Star, Copy, BookmarkPlus, Check } from "lucide-react"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/toast-provider"
@@ -37,10 +37,23 @@ function LoginModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   );
 }
 
+// Define a type for a snippet
+interface Snippet {
+  _id: string;
+  title: string;
+  code: string;
+  language: string;
+  tags: string[];
+  upvotes: number;
+  upvotedBy?: string[];
+  author?: { name?: string };
+  // Add other fields as needed based on your API response
+}
+
 export default function SnippetDetail() {
   const params = useParams()
-  const [snippet, setSnippet] = useState<any | null>(null)
-  const [allSnippets, setAllSnippets] = useState<any[]>([])
+  const [snippet, setSnippet] = useState<Snippet | null>(null)
+  const [allSnippets, setAllSnippets] = useState<Snippet[]>([])
   const [copied, setCopied] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)

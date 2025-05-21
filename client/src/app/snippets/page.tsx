@@ -7,11 +7,12 @@ import { Input } from "@/components/ui/input"
 import { Search, Code2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import type { Snippet } from "@/lib/mockSnippets"
 
 export default function SnippetsPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null)
-  const [snippets, setSnippets] = useState<any[]>([])
+  const [snippets, setSnippets] = useState<Snippet[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const debounceTimeout = useRef<NodeJS.Timeout | null>(null)
@@ -147,7 +148,7 @@ export default function SnippetsPage() {
         {searchTerm && (
           <span>
             {" "}
-            matching <span className="text-primary">"{searchTerm}"</span>
+            matching <span className="text-primary">&quot;{searchTerm}&quot;</span>
           </span>
         )}
       </div>
@@ -173,7 +174,7 @@ export default function SnippetsPage() {
           </div>
           <h3 className="text-xl font-medium mb-2">No snippets found</h3>
           <p className="text-muted-foreground mb-6">
-            Try adjusting your search or filter to find what you're looking for
+            Try adjusting your search or filter to find what you&apos;re looking for
           </p>
           <Button
             variant="outline"

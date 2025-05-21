@@ -3,7 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { BookMarked, ExternalLink, Star, Trash2 } from 'lucide-react'
+import { BookMarked, ExternalLink, Star } from 'lucide-react'
 import Link from "next/link"
 import { useState } from "react"
 import { Input } from "@/components/ui/input"
@@ -22,14 +22,13 @@ interface Snippet {
 
 interface SavedSnippetsSectionProps {
   snippets: Snippet[]
-  onRemove: (snippetId: string) => void
+  // onRemove: (snippetId: string) => void
 }
 
-export function SavedSnippetsSection({ snippets, onRemove }: SavedSnippetsSectionProps) {
+export function SavedSnippetsSection({ snippets }: SavedSnippetsSectionProps) {
   const [searchTerm, setSearchTerm] = useState("")
   const [languageFilter, setLanguageFilter] = useState<string | null>(null)
   const [sortBy, setSortBy] = useState<"newest" | "oldest" | "upvotes">("newest")
-
   // Get unique languages
   const languages = [...new Set(snippets.map((snippet) => snippet.language))]
 
@@ -57,7 +56,7 @@ export function SavedSnippetsSection({ snippets, onRemove }: SavedSnippetsSectio
     <Card>
       <CardHeader className="p-4 sm:p-6">
         <CardTitle className="text-lg sm:text-xl">Saved Snippets</CardTitle>
-        <CardDescription className="text-xs sm:text-sm">Code snippets you've saved for future reference</CardDescription>
+        <CardDescription className="text-xs sm:text-sm">Code snippets you&apos;ve saved for future reference</CardDescription>
       </CardHeader>
       <CardContent className="p-4 sm:p-6">
         {snippets.length > 0 ? (

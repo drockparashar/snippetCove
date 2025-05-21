@@ -31,7 +31,7 @@ export default function SubmitLayout({
         setIsLoggedIn(false);
         router.push("/login");
       });
-  }, []);
+  }, [router]);
 
   if (!isLoggedIn) return null // Show nothing while redirecting
 

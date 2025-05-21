@@ -1,10 +1,10 @@
 "use client"
 
-import React, { useEffect } from "react";
+import React, { useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation"
 import { useToast } from "@/components/toast-provider"
 
-export default function LoginPage() {
+function LoginPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get("redirect");
@@ -22,6 +22,7 @@ export default function LoginPage() {
       window.location.href = `http://localhost:5000/api/auth/github${redirectParam}`;
     } catch (err) {
       showToast("GitHub login failed. Please try again.", "error");
+      console.log(err);
     }
   };
 
@@ -32,7 +33,6 @@ export default function LoginPage() {
           <h1 className="text-2xl font-bold mb-2">Welcome back</h1>
           <p className="text-muted-foreground">Log in to your account to continue</p>
         </div>
-
         <div className="bg-card border border-border/50 rounded-xl p-6 shadow-lg">
           <button
             type="button"
@@ -45,5 +45,13 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
-  )
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LoginPageContent />
+    </Suspense>
+  );
 }

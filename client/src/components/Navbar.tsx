@@ -1,3 +1,4 @@
+
 "use client"
 
 import Link from "next/link"
@@ -5,7 +6,7 @@ import { useRouter } from "next/navigation"
 import { ThemeToggle } from "@/components/ThemeToggle"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import { Menu } from "lucide-react"
 import { useEffect, useState } from "react"
 
@@ -71,8 +72,8 @@ export default function Navbar() {
                   <DropdownMenuItem asChild>
                     <Link href="/dashboard">Profile</Link>
                   </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout} variant="destructive">Logout</DropdownMenuItem>
+                  {/* <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout} variant="destructive">Logout</DropdownMenuItem> */}
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
