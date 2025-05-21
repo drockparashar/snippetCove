@@ -19,7 +19,7 @@ function LoginPageContent() {
     try {
       // Pass the redirect param to the backend so it can redirect back after GitHub login
       const redirectParam = redirect ? `?redirect=${encodeURIComponent(redirect)}` : '';
-      window.location.href = `http://localhost:5000/api/auth/github${redirectParam}`;
+      window.location.href = `https://snippetcove.onrender.com/api/auth/github${redirectParam}`;
     } catch (err) {
       showToast("GitHub login failed. Please try again.", "error");
       console.log(err);

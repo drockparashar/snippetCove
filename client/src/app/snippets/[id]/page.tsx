@@ -68,19 +68,19 @@ export default function SnippetDetail() {
     if (params && typeof params.id === "string") {
       setLoading(true)
       Promise.all([
-        fetch(`http://localhost:5000/api/snippets/${params.id}`).then(res => {
+        fetch(`https://snippetcove.onrender.com/api/snippets/${params.id}`).then(res => {
           if (!res.ok) throw new Error("Snippet not found")
           return res.json()
         }),
-        fetch("http://localhost:5000/api/snippets").then(res => res.json()),
-        fetch("http://localhost:5000/api/auth/check", { credentials: "include" }).then(res => res.json())
+        fetch("https://snippetcove.onrender.com/api/snippets").then(res => res.json()),
+        fetch("https://snippetcove.onrender.com/api/auth/check", { credentials: "include" }).then(res => res.json())
       ])
         .then(([snippetData, allData, authData]) => {
           setSnippet(snippetData)
           setAllSnippets(allData)
           setLoading(false)
           if (authData.authenticated) {
-            fetch("http://localhost:5000/api/auth/me", { credentials: "include" })
+            fetch("https://snippetcove.onrender.com/api/auth/me", { credentials: "include" })
               .then(res => res.json())
               .then(user => {
                 setIsSaved(user.savedSnippets?.includes(snippetData._id))
@@ -118,7 +118,7 @@ export default function SnippetDetail() {
 
   const handleSave = async () => {
     if (!snippet) return
-    const res = await fetch(`http://localhost:5000/api/auth/save-snippet`, {
+    const res = await fetch(`https://snippetcove.onrender.com/api/auth/save-snippet`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -135,7 +135,7 @@ export default function SnippetDetail() {
 
   const handleUnsave = async () => {
     if (!snippet) return
-    const res = await fetch(`http://localhost:5000/api/auth/unsave-snippet`, {
+    const res = await fetch(`https://snippetcove.onrender.com/api/auth/unsave-snippet`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -160,7 +160,7 @@ export default function SnippetDetail() {
     setUpvoting(true)
     if (!hasUpvoted) {
       // Upvote
-      const res = await fetch("http://localhost:5000/api/snippets/upvote", {
+      const res = await fetch("https://snippetcove.onrender.com/api/snippets/upvote", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ snippetId: snippet._id, userId })
@@ -175,7 +175,7 @@ export default function SnippetDetail() {
       }
     } else {
       // Remove upvote
-      const res = await fetch("http://localhost:5000/api/snippets/upvote/remove", {
+      const res = await fetch("https://snippetcove.onrender.com/api/snippets/upvote/remove", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ snippetId: snippet._id, userId })

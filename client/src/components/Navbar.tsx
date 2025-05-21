@@ -18,7 +18,7 @@ export default function Navbar() {
 
   useEffect(() => {
     // Check authentication status from backend
-    fetch("http://localhost:5000/api/auth/check", { credentials: "include" })
+    fetch("https://snippetcove.onrender.com/api/auth/check", { credentials: "include" })
       .then((res) => res.json())
       .then((data) => {
         if (data.authenticated) {
@@ -36,7 +36,7 @@ export default function Navbar() {
   }, [])
 
   const handleLogout = async () => {
-    await fetch("http://localhost:5000/api/auth/logout", { credentials: "include" })
+    await fetch("https://snippetcove.onrender.com/api/auth/logout", { credentials: "include" })
     setIsLoggedIn(false)
     setUser(null)
     router.push("/login")

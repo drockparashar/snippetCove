@@ -15,7 +15,7 @@ export default function SubmitLayout({
 
   useEffect(() => {
     // Check for GitHub login by looking for a session cookie (or a backend endpoint)
-    fetch("http://localhost:5000/api/auth/check", {
+    fetch("https://snippetcove.onrender.com/api/auth/check", {
       credentials: "include"
     })
       .then(res => res.json())

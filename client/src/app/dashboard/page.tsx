@@ -48,7 +48,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     // Check if user is authenticated
-    fetch("http://localhost:5000/api/auth/check", { credentials: "include" })
+    fetch("https://snippetcove.onrender.com/api/auth/check", { credentials: "include" })
       .then((res) => res.json())
       .then((data) => {
         if (!data.authenticated) {
@@ -57,7 +57,7 @@ export default function DashboardPage() {
         }
 
         // Fetch user data
-        return fetch("http://localhost:5000/api/auth/me", { credentials: "include" }).then((res) => res.json())
+        return fetch("https://snippetcove.onrender.com/api/auth/me", { credentials: "include" }).then((res) => res.json())
       })
       .then((userData) => {
         if (!userData) return
@@ -66,7 +66,7 @@ export default function DashboardPage() {
         // Fetch saved snippets
         if (userData.savedSnippets?.length) {
           const savedPromises = userData.savedSnippets.map((id: string) =>
-            fetch(`http://localhost:5000/api/snippets/${id}`).then((res) => res.json()),
+            fetch(`https://snippetcove.onrender.com/api/snippets/${id}`).then((res) => res.json()),
           )
           Promise.all(savedPromises).then((snippets) => {
             setSavedSnippets(snippets.filter(Boolean))
@@ -76,7 +76,7 @@ export default function DashboardPage() {
         // Fetch created snippets
         if (userData.createdSnippets?.length) {
           const createdPromises = userData.createdSnippets.map((id: string) =>
-            fetch(`http://localhost:5000/api/snippets/${id}`).then((res) => res.json()),
+            fetch(`https://snippetcove.onrender.com/api/snippets/${id}`).then((res) => res.json()),
           )
           Promise.all(createdPromises).then((snippets) => {
             const validSnippets = snippets.filter(Boolean)
@@ -85,7 +85,7 @@ export default function DashboardPage() {
         }
 
         // Fetch total upvotes using the new backend route
-        fetch(`http://localhost:5000/api/snippets/user/${userData._id}/upvotes`)
+        fetch(`https://snippetcove.onrender.com/api/snippets/user/${userData._id}/upvotes`)
           .then((res) => res.json())
           .then((data) => {
             setTotalUpvotes(data.totalUpvotes || 0)

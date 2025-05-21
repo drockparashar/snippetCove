@@ -43,7 +43,7 @@ export function SettingsDialog({ open, onOpenChange, user }: SettingsDialogProps
 
     try {
       // This would be the actual API call to update the user profile
-      const res = await fetch("http://localhost:5000/api/auth/update-profile", {
+      const res = await fetch("https://snippetcove.onrender.com/api/auth/update-profile", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

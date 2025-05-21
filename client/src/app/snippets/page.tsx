@@ -23,9 +23,9 @@ export default function SnippetsPage() {
     setLoading(true)
     if (debounceTimeout.current) clearTimeout(debounceTimeout.current)
     debounceTimeout.current = setTimeout(() => {
-      let url = "http://localhost:5000/api/snippets"
+      let url = "https://snippetcove.onrender.com/api/snippets"
       if (searchTerm.trim()) {
-        url = `http://localhost:5000/api/snippets/search?q=${encodeURIComponent(searchTerm.trim())}`
+        url = `https://snippetcove.onrender.com/api/snippets/search?q=${encodeURIComponent(searchTerm.trim())}`
       }
       fetch(url)
         .then((res) => {
@@ -80,7 +80,7 @@ export default function SnippetsPage() {
           className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
           onClick={() => {
             // Check if user is authenticated before redirecting
-            fetch("http://localhost:5000/api/auth/check", { credentials: "include" })
+            fetch("https://snippetcove.onrender.com/api/auth/check", { credentials: "include" })
               .then(res => res.json())
               .then(data => {
                 if (data.authenticated) {

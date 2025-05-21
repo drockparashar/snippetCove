@@ -36,7 +36,7 @@ export default function SubmitSnippetPage() {
       return;
     }
     // Send snippet to backend with credentials (session cookie)
-    const res = await fetch("http://localhost:5000/api/snippets", {
+    const res = await fetch("https://snippetcove.onrender.com/api/snippets", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
