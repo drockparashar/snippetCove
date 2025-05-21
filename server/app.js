@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import connectDB from "./config/db.js";
 import snippetRoutes from "./routes/snippets.js";
-import authRoutes from "./routes/authROutes.js";
+import authRoutes from "./routes/authRoutes.js";
 import githubAuthRoutes from "./routes/githubAuth.js";
 import checkAuthRoutes from "./routes/checkAuth.js";
 import populate from "./populate.js";
