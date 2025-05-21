@@ -10,6 +10,7 @@ import session from "express-session";
 import passport from "passport";
 import "./controllers/passport.js";
 import dotenv from "dotenv";
+import { getSessionMiddleware } from "./config/session.js";
 
 dotenv.config();
 
@@ -25,13 +26,7 @@ app.use(
 app.use(express.json());
 
 // Session middleware (required for Passport)
-app.use(
-  session({
-    secret: process.env.JWT_SECRET || "keyboard cat",
-    resave: false,
-    saveUninitialized: false,
-  })
-);
+app.use(getSessionMiddleware());
 
 // Passport middleware
 app.use(passport.initialize());
