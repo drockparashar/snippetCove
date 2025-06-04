@@ -8,6 +8,7 @@ import { Search, Code2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import type { Snippet } from "@/lib/mockSnippets"
+import { BACKEND_URL } from "@/lib/backend"
 
 export default function SnippetsPage() {
   const [searchTerm, setSearchTerm] = useState("")
@@ -23,9 +24,9 @@ export default function SnippetsPage() {
     setLoading(true)
     if (debounceTimeout.current) clearTimeout(debounceTimeout.current)
     debounceTimeout.current = setTimeout(() => {
-      let url = "https://snippetcove.onrender.com/api/snippets"
+      let url = `${BACKEND_URL}/api/snippets`
       if (searchTerm.trim()) {
-        url = `https://snippetcove.onrender.com/api/snippets/search?q=${encodeURIComponent(searchTerm.trim())}`
+        url = `${BACKEND_URL}/api/snippets/search?q=${encodeURIComponent(searchTerm.trim())}`
       }
       fetch(url)
         .then((res) => {
@@ -80,7 +81,7 @@ export default function SnippetsPage() {
           className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
           onClick={() => {
             // Check if user is authenticated before redirecting
-            fetch("https://snippetcove.onrender.com/api/auth/check", { credentials: "include" })
+            fetch(`${BACKEND_URL}/api/auth/check`, { credentials: "include" })
               .then(res => res.json())
               .then(data => {
                 if (data.authenticated) {

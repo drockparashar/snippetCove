@@ -18,6 +18,7 @@ import { Separator } from "@/components/ui/separator"
 import { Switch } from "@/components/ui/switch"
 import { Github, Mail, Save, Trash2, User } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { BACKEND_URL } from "@/lib/backend"
 
 interface UserProfile {
   name: string;
@@ -43,7 +44,7 @@ export function SettingsDialog({ open, onOpenChange, user }: SettingsDialogProps
 
     try {
       // This would be the actual API call to update the user profile
-      const res = await fetch("https://snippetcove.onrender.com/api/auth/update-profile", {
+      const res = await fetch(`${BACKEND_URL}/api/auth/update-profile`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

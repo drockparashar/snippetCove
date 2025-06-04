@@ -13,6 +13,7 @@ import { SavedSnippetsSection } from "@/components/saved-snippets-section"
 import { StatsSection } from "@/components/stats-section"
 import { SettingsDialog } from "@/components/settings-dialog"
 import { useToast } from "@/components/toast-provider"
+import { BACKEND_URL } from "@/lib/backend"
 
 interface UserData {
   _id: string
@@ -48,7 +49,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     // Check if user is authenticated
-    fetch("https://snippetcove.onrender.com/api/auth/check", { credentials: "include" })
+    fetch(`${BACKEND_URL}/api/auth/check`, { credentials: "include" })
       .then((res) => res.json())
       .then((data) => {
         if (!data.authenticated) {
@@ -57,7 +58,7 @@ export default function DashboardPage() {
         }
 
         // Fetch user data
-        return fetch("https://snippetcove.onrender.com/api/auth/me", { credentials: "include" }).then((res) => res.json())
+        return fetch(`${BACKEND_URL}/api/auth/me`, { credentials: "include" }).then((res) => res.json())
       })
       .then((userData) => {
         if (!userData) return
@@ -66,7 +67,7 @@ export default function DashboardPage() {
         // Fetch saved snippets
         if (userData.savedSnippets?.length) {
           const savedPromises = userData.savedSnippets.map((id: string) =>
-            fetch(`https://snippetcove.onrender.com/api/snippets/${id}`).then((res) => res.json()),
+            fetch(`${BACKEND_URL}/api/snippets/${id}`).then((res) => res.json()),
           )
           Promise.all(savedPromises).then((snippets) => {
             setSavedSnippets(snippets.filter(Boolean))
@@ -76,7 +77,7 @@ export default function DashboardPage() {
         // Fetch created snippets
         if (userData.createdSnippets?.length) {
           const createdPromises = userData.createdSnippets.map((id: string) =>
-            fetch(`https://snippetcove.onrender.com/api/snippets/${id}`).then((res) => res.json()),
+            fetch(`${BACKEND_URL}/api/snippets/${id}`).then((res) => res.json()),
           )
           Promise.all(createdPromises).then((snippets) => {
             const validSnippets = snippets.filter(Boolean)
@@ -85,7 +86,7 @@ export default function DashboardPage() {
         }
 
         // Fetch total upvotes using the new backend route
-        fetch(`https://snippetcove.onrender.com/api/snippets/user/${userData._id}/upvotes`)
+        fetch(`${BACKEND_URL}/api/snippets/user/${userData._id}/upvotes`)
           .then((res) => res.json())
           .then((data) => {
             setTotalUpvotes(data.totalUpvotes || 0)

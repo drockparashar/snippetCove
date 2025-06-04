@@ -10,6 +10,7 @@ import { Code, FileCode, Hash, Info } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import CodeBlock from "@/components/CodeBlock"
 import { useToast } from "@/components/toast-provider"
+import { BACKEND_URL } from "@/lib/backend";
 
 export default function SubmitSnippetPage() {
   const [title, setTitle] = useState("")
@@ -36,7 +37,7 @@ export default function SubmitSnippetPage() {
       return;
     }
     // Send snippet to backend with credentials (session cookie)
-    const res = await fetch("https://snippetcove.onrender.com/api/snippets", {
+    const res = await fetch(`${BACKEND_URL}/api/snippets`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",

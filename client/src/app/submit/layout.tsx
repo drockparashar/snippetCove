@@ -4,6 +4,8 @@ import type React from "react"
 
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
+import {BACKEND_URL} from "@/lib/backend";
+
 
 export default function SubmitLayout({
   children,
@@ -15,7 +17,7 @@ export default function SubmitLayout({
 
   useEffect(() => {
     // Check for GitHub login by looking for a session cookie (or a backend endpoint)
-    fetch("https://snippetcove.onrender.com/api/auth/check", {
+    fetch(`${BACKEND_URL}/api/auth/check`, {
       credentials: "include"
     })
       .then(res => res.json())

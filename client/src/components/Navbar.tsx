@@ -1,4 +1,3 @@
-
 "use client"
 
 import Link from "next/link"
@@ -9,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import { Menu } from "lucide-react"
 import { useEffect, useState } from "react"
+import { BACKEND_URL } from "@/lib/backend"
 
 export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
@@ -18,7 +18,7 @@ export default function Navbar() {
 
   useEffect(() => {
     // Check authentication status from backend
-    fetch("https://snippetcove.onrender.com/api/auth/check", { credentials: "include" })
+    fetch(`${BACKEND_URL}/api/auth/check`, { credentials: "include" })
       .then((res) => res.json())
       .then((data) => {
         if (data.authenticated) {
@@ -36,7 +36,7 @@ export default function Navbar() {
   }, [])
 
   const handleLogout = async () => {
-    await fetch("https://snippetcove.onrender.com/api/auth/logout", { credentials: "include" })
+    await fetch(`${BACKEND_URL}/api/auth/logout`, { credentials: "include" })
     setIsLoggedIn(false)
     setUser(null)
     router.push("/login")
