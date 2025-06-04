@@ -1,5 +1,8 @@
 import express from "express";
 import passport from "passport";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const router = express.Router();
 
@@ -31,7 +34,9 @@ router.get(
     ) {
       redirectUrl = "/snippets";
     }
-    res.redirect(`http://localhost:3000${redirectUrl}`);
+    // Use environment variable for frontend URL
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+    res.redirect(`${frontendUrl}${redirectUrl}`);
   }
 );
 
