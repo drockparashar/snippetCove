@@ -10,7 +10,11 @@ export function getSessionMiddleware() {
     saveUninitialized: false,
     store: MongoStore.create({
       mongoUrl: process.env.MONGO_URI || "mongodb://localhost:27017/snipcove",
-      collectionName: "sessions"
-    })
+      collectionName: "sessions",
+    }),
+    cookie: {
+      sameSite: "none",
+      secure: true,
+    },
   });
 }
