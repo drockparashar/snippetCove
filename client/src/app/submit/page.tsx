@@ -11,8 +11,10 @@ import { Badge } from "@/components/ui/badge"
 import CodeBlock from "@/components/CodeBlock"
 import { useToast } from "@/components/toast-provider"
 import { BACKEND_URL } from "@/lib/backend";
+import { useAuth } from "@/components/auth-context";
 
 export default function SubmitSnippetPage() {
+  const { user } = useAuth();
   const [title, setTitle] = useState("")
   const [code, setCode] = useState("")
   const [language, setLanguage] = useState("javascript")
@@ -23,6 +25,11 @@ export default function SubmitSnippetPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) {
+      showToast("You must be logged in to submit a snippet.", "error");
+      router.push("/login?redirect=/submit");
+      return;
+    }
     // Frontend validation
     if (!title.trim()) {
       showToast("Title is required.", "error");
@@ -37,7 +44,9 @@ export default function SubmitSnippetPage() {
       return;
     }
     // Send snippet to backend with JWT
-    const token = typeof window !== "undefined" ? localStorage.getItem("snipcove_jwt") : null;
+    const token = typeof window !== "undefined"
+      ? (localStorage.getItem("snipcove_jwt") || localStorage.getItem("snipcove_token"))
+      : null;
     const res = await fetch(`${BACKEND_URL}/api/snippets`, {
       method: "POST",
       headers: {

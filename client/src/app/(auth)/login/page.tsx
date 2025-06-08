@@ -4,20 +4,23 @@ import React, { useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation"
 import { useToast } from "@/components/toast-provider"
 import {BACKEND_URL} from "@/lib/backend";
+import { useAuth } from "@/components/auth-context";
 
 function LoginPageContent() {
+  const { login } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get("redirect");
   const { showToast } = useToast();
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
     // Check for JWT token in URL after GitHub OAuth
     const url = new URL(window.location.href);
     const token = url.searchParams.get("token");
     if (token) {
-      // Store token in localStorage
-      localStorage.setItem("snipcove_jwt", token);
+      // Store token in localStorage under both keys for compatibility
+      login(token);
       // Remove token from URL
       url.searchParams.delete("token");
       window.history.replaceState({}, document.title, url.pathname + url.search);
@@ -25,7 +28,7 @@ function LoginPageContent() {
       const redirectParam = url.searchParams.get("redirect") || "/dashboard";
       router.replace(redirectParam);
     }
-  }, [router]);
+  }, [router, login]);
 
   const handleGithubLogin = async () => {
     try {

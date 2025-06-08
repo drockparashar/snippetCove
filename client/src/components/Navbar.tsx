@@ -5,56 +5,24 @@ import { useRouter } from "next/navigation"
 import { ThemeToggle } from "@/components/ThemeToggle"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu"
-import { Menu } from "lucide-react"
-import { useEffect, useState } from "react"
-import { BACKEND_URL } from "@/lib/backend"
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
+import { User, Settings, LogOut } from "lucide-react"
+import { useAuth } from "@/components/auth-context"
 
 export default function Navbar() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [user, setUser] = useState<{ name: string; email: string } | null>(null)
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const router = useRouter()
-
-  useEffect(() => {
-    // Check authentication status using JWT
-    const token = typeof window !== "undefined" ? localStorage.getItem("snipcove_jwt") : null;
-    if (!token) {
-      setIsLoggedIn(false);
-      setUser(null);
-      return;
-    }
-    fetch(`${BACKEND_URL}/api/auth/check`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.authenticated) {
-          setIsLoggedIn(true);
-          // Optionally fetch user info here if needed
-        } else {
-          setIsLoggedIn(false);
-          setUser(null);
-        }
-      })
-      .catch(() => {
-        setIsLoggedIn(false);
-        setUser(null);
-      });
-  }, []);
+  const { user, logout } = useAuth();
+  const router = useRouter();
 
   const handleLogout = async () => {
-    localStorage.removeItem("snipcove_jwt");
-    setIsLoggedIn(false);
-    setUser(null);
+    logout();
     router.push("/login");
-  }
+  };
 
   return (
     <header className="sticky top-0 z-50 backdrop-blur-md bg-background/80 border-b border-border/50">
       <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center h-16">
-          <Link href="/" className="flex items-center gap-2 font-semibold text-lg">
+        <div className="flex items-center h-16 justify-end w-full">
+          <Link href="/" className="flex items-center gap-2 font-semibold text-lg mr-auto">
             {/* Logo or Icon */}
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" className="text-primary"><rect width="24" height="24" rx="6" fill="currentColor"/></svg>
             <span>SnipCove</span>
@@ -62,66 +30,59 @@ export default function Navbar() {
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex gap-4 items-center">
-            <Link href="/snippets" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">Explore</Link>
-            <Link href="/submit" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">Submit</Link>
-            {isLoggedIn && (
-              <Link href="/dashboard" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">Dashboard</Link>
-            )}
+            <Link href="/snippets" className="text-l font-medium text-muted-foreground transition-colors hover:text-foreground">Explore</Link>
+            <Link href="/submit" className="text-l font-medium text-muted-foreground transition-colors hover:text-foreground">Submit</Link>
+          </nav>
+
+          <div className="flex items-center gap-2 ml-4">
             <ThemeToggle />
-            {isLoggedIn ? (
+            {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Avatar className="h-8 w-8 cursor-pointer">
-                    <AvatarImage src="/api/placeholder/32/32" alt={user?.name || "User"} />
-                    <AvatarFallback>{user?.name?.[0] || "U"}</AvatarFallback>
-                  </Avatar>
+                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={`/api/placeholder/32/32`} alt={user.name} />
+                      <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                  </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
+                <DropdownMenuContent className="w-56" align="end" forceMount>
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium leading-none">{user.name}</p>
+                      <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
-                    <Link href="/dashboard">Profile</Link>
+                    <Link href="/dashboard">
+                      <User className="mr-2 h-4 w-4" />
+                      <span>Dashboard</span>
+                    </Link>
                   </DropdownMenuItem>
-                  {/* <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout} variant="destructive">Logout</DropdownMenuItem> */}
+                  <DropdownMenuItem asChild>
+                    <Link href="/dashboard/settings">
+                      <Settings className="mr-2 h-4 w-4" />
+                      <span>Settings</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log out</span>
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button asChild variant="outline" size="sm">
-                <Link href="/login">Login</Link>
-              </Button>
+              <Link href="/login">
+                <Button variant="outline" size="sm">
+                  Login
+                </Button>
+              </Link>
             )}
-          </nav>
-
-          {/* Mobile Hamburger */}
-          <button className="md:hidden p-2 rounded hover:bg-muted" onClick={() => setIsMenuOpen((v) => !v)}>
-            <Menu className="h-6 w-6" />
-          </button>
+          </div>
         </div>
       </div>
-
-      {/* Mobile Menu */}
-      {isMenuOpen && (
-        <div className="md:hidden bg-background border-t border-border/50 px-4 pb-4">
-          <nav className="flex flex-col gap-2 mt-2">
-            <Link href="/snippets" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground" onClick={() => setIsMenuOpen(false)}>Explore</Link>
-            <Link href="/submit" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground" onClick={() => setIsMenuOpen(false)}>Submit</Link>
-            {isLoggedIn && (
-              <Link href="/dashboard" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground" onClick={() => setIsMenuOpen(false)}>Dashboard</Link>
-            )}
-            <ThemeToggle />
-            {isLoggedIn ? (
-              <>
-                <Link href="/dashboard" className="text-sm font-medium" onClick={() => setIsMenuOpen(false)}>Profile</Link>
-                <Link href="/dashboard/settings" className="text-sm font-medium" onClick={() => setIsMenuOpen(false)}>Settings</Link>
-                <Button variant="destructive" size="sm" className="mt-2" onClick={() => { handleLogout(); setIsMenuOpen(false); }}>Logout</Button>
-              </>
-            ) : (
-              <Button asChild variant="outline" size="sm" className="mt-2" onClick={() => setIsMenuOpen(false)}>
-                <Link href="/login">Login</Link>
-              </Button>
-            )}
-          </nav>
-        </div>
-      )}
     </header>
   )
 }

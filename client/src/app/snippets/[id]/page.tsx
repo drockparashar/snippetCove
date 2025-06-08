@@ -9,6 +9,7 @@ import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/toast-provider"
 import { BACKEND_URL } from "@/lib/backend"
+import { useAuth } from "@/components/auth-context"
 
 function LoginModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const params = useParams();
@@ -61,44 +62,37 @@ export default function SnippetDetail() {
   const [isSaved, setIsSaved] = useState(false)
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [upvoting, setUpvoting] = useState(false)
-  const [userId, setUserId] = useState<string | null>(null)
   const [hasUpvoted, setHasUpvoted] = useState(false)
+  const { user } = useAuth();
   const { showToast } = useToast();
 
   useEffect(() => {
     if (params && typeof params.id === "string") {
-      setLoading(true)
+      setLoading(true);
       Promise.all([
         fetch(`${BACKEND_URL}/api/snippets/${params.id}`).then(res => {
-          if (!res.ok) throw new Error("Snippet not found")
-          return res.json()
+          if (!res.ok) throw new Error("Snippet not found");
+          return res.json();
         }),
         fetch(`${BACKEND_URL}/api/snippets`).then(res => res.json()),
-        fetch(`${BACKEND_URL}/api/auth/check`, { credentials: "include" }).then(res => res.json())
       ])
-        .then(([snippetData, allData, authData]) => {
-          setSnippet(snippetData)
-          setAllSnippets(allData)
-          setLoading(false)
-          if (authData.authenticated) {
-            fetch(`${BACKEND_URL}/api/auth/me`, { credentials: "include" })
-              .then(res => res.json())
-              .then(user => {
-                setIsSaved(user.savedSnippets?.includes(snippetData._id))
-                setUserId(user._id)
-                setHasUpvoted(snippetData.upvotedBy?.includes(user._id))
-              })
+        .then(([snippetData, allData]) => {
+          setSnippet(snippetData);
+          setAllSnippets(allData);
+          setLoading(false);
+          if (user) {
+            setIsSaved(!!user.savedSnippets?.includes(snippetData._id));
+            setHasUpvoted(snippetData.upvotedBy?.includes(user._id));
           } else {
-            setUserId(null)
-            setHasUpvoted(false)
+            setHasUpvoted(false);
           }
         })
         .catch((err) => {
-          setError(err.message)
-          setLoading(false)
-        })
+          setError(err.message);
+          setLoading(false);
+        });
     }
-  }, [params])
+  }, [params, user])
 
   if (loading) return (
     <div className="container mx-auto py-12 px-4 text-center">
@@ -118,79 +112,102 @@ export default function SnippetDetail() {
   }
 
   const handleSave = async () => {
-    if (!snippet) return
+    if (!snippet) return;
+    if (!user) {
+      setShowLoginModal(true);
+      showToast("You must be logged in to save snippets.", "error");
+      return;
+    }
+    const token = localStorage.getItem("snipcove_jwt") || localStorage.getItem("snipcove_token");
     const res = await fetch(`${BACKEND_URL}/api/auth/save-snippet`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
       body: JSON.stringify({ snippetId: snippet._id })
-    })
+    });
     if (res.ok) {
-      setIsSaved(true)
-      showToast("Snippet saved!", "success")
+      setIsSaved(true);
+      showToast("Snippet saved!", "success");
     } else {
-      setShowLoginModal(true)
-      showToast("You must be logged in to save snippets.", "error")
+      setShowLoginModal(true);
+      showToast("You must be logged in to save snippets.", "error");
     }
-  }
+  };
 
   const handleUnsave = async () => {
-    if (!snippet) return
+    if (!snippet) return;
+    if (!user) {
+      setShowLoginModal(true);
+      showToast("You must be logged in to unsave snippets.", "error");
+      return;
+    }
+    const token = localStorage.getItem("snipcove_jwt") || localStorage.getItem("snipcove_token");
     const res = await fetch(`${BACKEND_URL}/api/auth/unsave-snippet`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
       body: JSON.stringify({ snippetId: snippet._id })
-    })
+    });
     if (res.ok) {
-      setIsSaved(false)
-      showToast("Snippet removed from saved.", "success")
+      setIsSaved(false);
+      showToast("Snippet removed from saved.", "success");
     } else {
-      setShowLoginModal(true)
-      showToast("You must be logged in to unsave snippets.", "error")
+      setShowLoginModal(true);
+      showToast("You must be logged in to unsave snippets.", "error");
     }
-  }
+  };
 
   const handleUpvoteToggle = async () => {
-    if (!userId) {
-      setShowLoginModal(true)
-      showToast("You must be logged in to upvote.", "error")
-      return
+    if (!user) {
+      setShowLoginModal(true);
+      showToast("You must be logged in to upvote.", "error");
+      return;
     }
-    if (!snippet) return
-    setUpvoting(true)
+    if (!snippet) return;
+    setUpvoting(true);
+    const token = localStorage.getItem("snipcove_jwt") || localStorage.getItem("snipcove_token");
     if (!hasUpvoted) {
       // Upvote
       const res = await fetch(`${BACKEND_URL}/api/snippets/upvote`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ snippetId: snippet._id, userId })
-      })
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ snippetId: snippet._id, userId: user._id })
+      });
       if (res.ok) {
-        const updated = await res.json()
-        setSnippet({ ...snippet, upvotes: updated.upvotes, upvotedBy: updated.upvotedBy })
-        setHasUpvoted(true)
-        showToast("Upvoted!", "success")
+        const updated = await res.json();
+        setSnippet({ ...snippet, upvotes: updated.upvotes, upvotedBy: updated.upvotedBy });
+        setHasUpvoted(true);
+        showToast("Upvoted!", "success");
       } else {
-        showToast("Failed to upvote.", "error")
+        showToast("Failed to upvote.", "error");
       }
     } else {
       // Remove upvote
       const res = await fetch(`${BACKEND_URL}/api/snippets/upvote/remove`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ snippetId: snippet._id, userId })
-      })
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ snippetId: snippet._id, userId: user._id })
+      });
       if (res.ok) {
-        const updated = await res.json()
-        setSnippet({ ...snippet, upvotes: updated.upvotes, upvotedBy: updated.upvotedBy })
-        setHasUpvoted(false)
-        showToast("Upvote removed.", "success")
+        const updated = await res.json();
+        setSnippet({ ...snippet, upvotes: updated.upvotes, upvotedBy: updated.upvotedBy });
+        setHasUpvoted(false);
+        showToast("Upvote removed.", "success");
       } else {
-        showToast("Failed to remove upvote.", "error")
+        showToast("Failed to remove upvote.", "error");
       }
     }
-    setUpvoting(false)
+    setUpvoting(false);
   }
 
   // Find similar snippets (sharing at least one tag, not itself)

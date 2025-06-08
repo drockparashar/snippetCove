@@ -5,6 +5,8 @@ import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import Navbar from "@/components/Navbar"
 import { ToastProvider } from "@/components/toast-provider"
+import { TokenHandler } from "@/components/TokenHandler"
+import { AuthProvider } from "@/components/auth-context"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,14 +31,17 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
-          <ToastProvider>
-            <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-background/90">
-              <Navbar />
-              <main>{children}</main>
-            </div>
-          </ToastProvider>
-        </ThemeProvider>
+        <TokenHandler />
+        <AuthProvider>
+          <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+            <ToastProvider>
+              <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-background/90">
+                <Navbar />
+                <main>{children}</main>
+              </div>
+            </ToastProvider>
+          </ThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   )

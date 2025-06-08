@@ -12,17 +12,9 @@ import { MySnippetsSection } from "@/components/my-snippets-section"
 import { SavedSnippetsSection } from "@/components/saved-snippets-section"
 import { StatsSection } from "@/components/stats-section"
 import { SettingsDialog } from "@/components/settings-dialog"
-import { useToast } from "@/components/toast-provider"
+// import { useToast } from "@/components/toast-provider"
 import { BACKEND_URL } from "@/lib/backend"
-
-interface UserData {
-  _id: string
-  name: string
-  email: string
-  githubId?: string
-  savedSnippets: string[]
-  createdSnippets: string[]
-}
+import { useAuth } from "@/components/auth-context"
 
 interface Snippet {
   _id: string
@@ -36,120 +28,46 @@ interface Snippet {
 }
 
 export default function DashboardPage() {
-  const [user, setUser] = useState<UserData | null>(null)
-  const [savedSnippets, setSavedSnippets] = useState<Snippet[]>([])
-  const [createdSnippets, setCreatedSnippets] = useState<Snippet[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [activeTab, setActiveTab] = useState("profile")
-  const [settingsOpen, setSettingsOpen] = useState(false)
-  const [totalUpvotes, setTotalUpvotes] = useState(0)
-  const router = useRouter()
-  const { showToast } = useToast();
+  const { user, loading } = useAuth();
+  const [savedSnippets, setSavedSnippets] = useState<Snippet[]>([]);
+  const [createdSnippets, setCreatedSnippets] = useState<Snippet[]>([]);
+  const [activeTab, setActiveTab] = useState("profile");
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
-    // Check if user is authenticated using JWT
-    const token = typeof window !== "undefined" ? localStorage.getItem("snipcove_jwt") : null;
-    if (!token) {
+    if (!user && !loading) {
       router.push("/login?redirect=/dashboard");
       return;
     }
-    fetch(`${BACKEND_URL}/api/auth/check`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (!data.authenticated) {
-          router.push("/login?redirect=/dashboard");
-          return;
-        }
-        // Fetch user data
-        return fetch(`${BACKEND_URL}/api/auth/me`, {
-          headers: { Authorization: `Bearer ${token}` },
-        }).then((res) => res.json());
-      })
-      .then((userData) => {
-        if (!userData) return;
-        setUser(userData);
-        // Fetch saved snippets
-        if (userData.savedSnippets?.length) {
-          const savedPromises = userData.savedSnippets.map((id: string) =>
-            fetch(`${BACKEND_URL}/api/snippets/${id}`).then((res) => res.json()),
-          );
-          Promise.all(savedPromises).then((snippets) => {
-            setSavedSnippets(snippets.filter(Boolean));
-          });
-        }
-        // Fetch created snippets
-        if (userData.createdSnippets?.length) {
-          const createdPromises = userData.createdSnippets.map((id: string) =>
-            fetch(`${BACKEND_URL}/api/snippets/${id}`).then((res) => res.json()),
-          );
-          Promise.all(createdPromises).then((snippets) => {
-            const validSnippets = snippets.filter(Boolean);
-            setCreatedSnippets(validSnippets);
-          });
-        }
-        // Fetch total upvotes using the new backend route
-        fetch(`${BACKEND_URL}/api/snippets/user/${userData._id}/upvotes`)
-          .then((res) => res.json())
-          .then((data) => {
-            setTotalUpvotes(data.totalUpvotes || 0);
-          })
-          .catch(() => setTotalUpvotes(0));
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Error fetching user data:", err);
-        setError("Failed to load user data. Please try again later.");
-        showToast("Failed to load user data. Please try again later.", "error");
-        setLoading(false);
-      });
-  }, [router])
+    if (user) {
+      // Fetch saved snippets
+      if (user.savedSnippets?.length) {
+        const savedPromises = user.savedSnippets.map((id: string) =>
+          fetch(`${BACKEND_URL}/api/snippets/${id}`).then((res) => res.json()),
+        );
+        Promise.all(savedPromises).then((snippets) => {
+          setSavedSnippets(snippets.filter(Boolean));
+        });
+      } else {
+        setSavedSnippets([]);
+      }
+      // Fetch created snippets
+      if (user.createdSnippets?.length) {
+        const createdPromises = user.createdSnippets.map((id: string) =>
+          fetch(`${BACKEND_URL}/api/snippets/${id}`).then((res) => res.json()),
+        );
+        Promise.all(createdPromises).then((snippets) => {
+          setCreatedSnippets(snippets.filter(Boolean));
+        });
+      } else {
+        setCreatedSnippets([]);
+      }
+    }
+  }, [user, loading, router])
 
-  // const handleLogout = async () => {
-  //   try {
-  //     await fetch("http://localhost:5000/api/auth/logout", {
-  //       method: "POST",
-  //       credentials: "include",
-  //     })
-  //     setUser(null)
-  //     showToast("Logged out successfully.", "success")
-  //     router.push("/login")
-  //   } catch (error) {
-  //     showToast("Logout failed. Please try again.", "error")
-  //   }
-  // }
-
-  // const handleRemoveSavedSnippet = async (snippetId: string) => {
-  //   try {
-  //     const res = await fetch(`http://localhost:5000/api/auth/unsave-snippet`, {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       credentials: "include",
-  //       body: JSON.stringify({ snippetId }),
-  //     })
-
-  //     if (res.ok) {
-  //       // Update the UI by removing the snippet from the saved list
-  //       setSavedSnippets(savedSnippets.filter((snippet) => snippet._id !== snippetId))
-  //       showToast("Snippet removed from saved.", "success")
-
-  //       // Update user data
-  //       if (user) {
-  //         setUser({
-  //           ...user,
-  //           savedSnippets: user.savedSnippets.filter((id) => id !== snippetId),
-  //         })
-  //       }
-  //     } else {
-  //       showToast("Failed to remove snippet.", "error")
-  //     }
-  //   } catch (error) {
-  //     showToast("Failed to remove snippet.", "error");
-  //     console.log(error);
-  //   }
-  // }
+  // Calculate total upvotes for created snippets
+  const totalUpvotes = createdSnippets.reduce((sum, s) => sum + (s.upvotes || 0), 0);
 
   if (loading) {
     return (
@@ -159,19 +77,6 @@ export default function DashboardPage() {
         </div>
         <h3 className="text-xl font-medium mb-2">Loading your dashboard...</h3>
         <p className="text-muted-foreground">Please wait while we fetch your data</p>
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className="container mx-auto py-8 md:py-12 px-4 text-center">
-        <div className="inline-block p-3 rounded-full bg-muted mb-4">
-          <User className="h-6 w-6 text-destructive" />
-        </div>
-        <h3 className="text-xl font-medium mb-2">Error loading dashboard</h3>
-        <p className="text-muted-foreground mb-6">{error}</p>
-        <Button onClick={() => window.location.reload()}>Try Again</Button>
       </div>
     )
   }
@@ -205,10 +110,6 @@ export default function DashboardPage() {
               New Snippet
             </Button>
           </Link>
-          {/* <Button variant="outline" size="sm" className="text-xs md:text-sm" onClick={handleLogout}>
-            <LogOut className="mr-1 md:mr-2 h-3 w-3 md:h-4 md:w-4" />
-            Logout
-          </Button> */}
         </div>
       </div>
 
