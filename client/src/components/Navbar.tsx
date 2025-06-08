@@ -17,29 +17,37 @@ export default function Navbar() {
   const router = useRouter()
 
   useEffect(() => {
-    // Check authentication status from backend
-    fetch(`${BACKEND_URL}/api/auth/check`, { credentials: "include" })
+    // Check authentication status using JWT
+    const token = typeof window !== "undefined" ? localStorage.getItem("snipcove_jwt") : null;
+    if (!token) {
+      setIsLoggedIn(false);
+      setUser(null);
+      return;
+    }
+    fetch(`${BACKEND_URL}/api/auth/check`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
       .then((res) => res.json())
       .then((data) => {
         if (data.authenticated) {
-          setIsLoggedIn(true)
-          setUser(data.user)
+          setIsLoggedIn(true);
+          // Optionally fetch user info here if needed
         } else {
-          setIsLoggedIn(false)
-          setUser(null)
+          setIsLoggedIn(false);
+          setUser(null);
         }
       })
       .catch(() => {
-        setIsLoggedIn(false)
-        setUser(null)
-      })
-  }, [])
+        setIsLoggedIn(false);
+        setUser(null);
+      });
+  }, []);
 
   const handleLogout = async () => {
-    await fetch(`${BACKEND_URL}/api/auth/logout`, { credentials: "include" })
-    setIsLoggedIn(false)
-    setUser(null)
-    router.push("/login")
+    localStorage.removeItem("snipcove_jwt");
+    setIsLoggedIn(false);
+    setUser(null);
+    router.push("/login");
   }
 
   return (

@@ -16,9 +16,15 @@ export default function SubmitLayout({
   const router = useRouter()
 
   useEffect(() => {
-    // Check for GitHub login by looking for a session cookie (or a backend endpoint)
+    // Check for JWT token in localStorage
+    const token = typeof window !== "undefined" ? localStorage.getItem("snipcove_jwt") : null;
+    if (!token) {
+      setIsLoggedIn(false);
+      router.push("/login");
+      return;
+    }
     fetch(`${BACKEND_URL}/api/auth/check`, {
-      credentials: "include"
+      headers: { Authorization: `Bearer ${token}` },
     })
       .then(res => res.json())
       .then(data => {

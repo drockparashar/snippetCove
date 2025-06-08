@@ -1,6 +1,7 @@
 import express from "express";
 import passport from "passport";
 import dotenv from "dotenv";
+import jwt from "jsonwebtoken";
 
 dotenv.config();
 
@@ -19,11 +20,15 @@ router.get("/github", (req, res, next) => {
 });
 
 // GitHub OAuth callback using state param for redirect
+import User from "../models/User.js";
+
 router.get(
   "/github/callback",
-  passport.authenticate("github", { failureRedirect: "/login", session: true }),
-  (req, res) => {
-    // Use redirect from state param if available
+  passport.authenticate("github", {
+    failureRedirect: "/login",
+    session: false,
+  }),
+  async (req, res) => {
     let redirectUrl = req.query.state
       ? decodeURIComponent(req.query.state)
       : null;
@@ -34,9 +39,15 @@ router.get(
     ) {
       redirectUrl = "/snippets";
     }
-    // Use environment variable for frontend URL
     const frontendUrl = process.env.FRONTEND_URL;
-    res.redirect(`${frontendUrl}${redirectUrl}`);
+    // Generate JWT for the authenticated user
+    const JWT_SECRET = process.env.JWT_SECRET || "secret_key";
+    const user = req.user;
+    const token = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, {
+      expiresIn: "7d",
+    });
+    // Redirect to frontend with token as query param
+    res.redirect(`${frontendUrl}${redirectUrl}?token=${token}`);
   }
 );
 

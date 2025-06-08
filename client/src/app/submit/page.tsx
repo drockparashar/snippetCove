@@ -36,11 +36,14 @@ export default function SubmitSnippetPage() {
       showToast("Please add at least one tag.", "error");
       return;
     }
-    // Send snippet to backend with credentials (session cookie)
+    // Send snippet to backend with JWT
+    const token = typeof window !== "undefined" ? localStorage.getItem("snipcove_jwt") : null;
     const res = await fetch(`${BACKEND_URL}/api/snippets`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
       body: JSON.stringify({ title, code, language, tags }),
     });
     if (res.ok) {

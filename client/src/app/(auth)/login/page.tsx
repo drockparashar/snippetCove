@@ -12,9 +12,20 @@ function LoginPageContent() {
   const { showToast } = useToast();
 
   useEffect(() => {
-    // Remove mock login check, only rely on real authentication
-    // (No redirect on page load)
-  }, [redirect, router]);
+    // Check for JWT token in URL after GitHub OAuth
+    const url = new URL(window.location.href);
+    const token = url.searchParams.get("token");
+    if (token) {
+      // Store token in localStorage
+      localStorage.setItem("snipcove_jwt", token);
+      // Remove token from URL
+      url.searchParams.delete("token");
+      window.history.replaceState({}, document.title, url.pathname + url.search);
+      // Redirect to intended page or dashboard
+      const redirectParam = url.searchParams.get("redirect") || "/dashboard";
+      router.replace(redirectParam);
+    }
+  }, [router]);
 
   const handleGithubLogin = async () => {
     try {

@@ -39,11 +39,7 @@ export const login = async (req, res) => {
 export const getMe = async (req, res) => {
   try {
     let user;
-    if (req.isAuthenticated && req.isAuthenticated()) {
-      user = await User.findById(req.user.id || req.user._id).select(
-        "-password"
-      );
-    } else if (req.userId) {
+    if (req.userId) {
       user = await User.findById(req.userId).select("-password");
     }
     if (!user) return res.status(401).json({ error: "Not authenticated" });
@@ -55,7 +51,7 @@ export const getMe = async (req, res) => {
 
 export const saveSnippet = async (req, res) => {
   try {
-    const userId = req.user?.id || req.user?._id || req.userId;
+    const userId = req.userId;
     if (!userId) return res.status(401).json({ error: "Not authenticated" });
     const { snippetId } = req.body;
     await User.findByIdAndUpdate(userId, {
@@ -69,7 +65,7 @@ export const saveSnippet = async (req, res) => {
 
 export const unsaveSnippet = async (req, res) => {
   try {
-    const userId = req.user?.id || req.user?._id || req.userId;
+    const userId = req.userId;
     if (!userId) return res.status(401).json({ error: "Not authenticated" });
     const { snippetId } = req.body;
     await User.findByIdAndUpdate(userId, {

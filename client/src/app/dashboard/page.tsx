@@ -48,59 +48,63 @@ export default function DashboardPage() {
   const { showToast } = useToast();
 
   useEffect(() => {
-    // Check if user is authenticated
-    fetch(`${BACKEND_URL}/api/auth/check`, { credentials: "include" })
+    // Check if user is authenticated using JWT
+    const token = typeof window !== "undefined" ? localStorage.getItem("snipcove_jwt") : null;
+    if (!token) {
+      router.push("/login?redirect=/dashboard");
+      return;
+    }
+    fetch(`${BACKEND_URL}/api/auth/check`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
       .then((res) => res.json())
       .then((data) => {
         if (!data.authenticated) {
-          router.push("/login?redirect=/dashboard")
-          return
+          router.push("/login?redirect=/dashboard");
+          return;
         }
-
         // Fetch user data
-        return fetch(`${BACKEND_URL}/api/auth/me`, { credentials: "include" }).then((res) => res.json())
+        return fetch(`${BACKEND_URL}/api/auth/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+        }).then((res) => res.json());
       })
       .then((userData) => {
-        if (!userData) return
-        setUser(userData)
-
+        if (!userData) return;
+        setUser(userData);
         // Fetch saved snippets
         if (userData.savedSnippets?.length) {
           const savedPromises = userData.savedSnippets.map((id: string) =>
             fetch(`${BACKEND_URL}/api/snippets/${id}`).then((res) => res.json()),
-          )
+          );
           Promise.all(savedPromises).then((snippets) => {
-            setSavedSnippets(snippets.filter(Boolean))
-          })
+            setSavedSnippets(snippets.filter(Boolean));
+          });
         }
-
         // Fetch created snippets
         if (userData.createdSnippets?.length) {
           const createdPromises = userData.createdSnippets.map((id: string) =>
             fetch(`${BACKEND_URL}/api/snippets/${id}`).then((res) => res.json()),
-          )
+          );
           Promise.all(createdPromises).then((snippets) => {
-            const validSnippets = snippets.filter(Boolean)
-            setCreatedSnippets(validSnippets)
-          })
+            const validSnippets = snippets.filter(Boolean);
+            setCreatedSnippets(validSnippets);
+          });
         }
-
         // Fetch total upvotes using the new backend route
         fetch(`${BACKEND_URL}/api/snippets/user/${userData._id}/upvotes`)
           .then((res) => res.json())
           .then((data) => {
-            setTotalUpvotes(data.totalUpvotes || 0)
+            setTotalUpvotes(data.totalUpvotes || 0);
           })
-          .catch(() => setTotalUpvotes(0))
-
-        setLoading(false)
+          .catch(() => setTotalUpvotes(0));
+        setLoading(false);
       })
       .catch((err) => {
-        console.error("Error fetching user data:", err)
-        setError("Failed to load user data. Please try again later.")
-        showToast("Failed to load user data. Please try again later.", "error")
-        setLoading(false)
-      })
+        console.error("Error fetching user data:", err);
+        setError("Failed to load user data. Please try again later.");
+        showToast("Failed to load user data. Please try again later.", "error");
+        setLoading(false);
+      });
   }, [router])
 
   // const handleLogout = async () => {
