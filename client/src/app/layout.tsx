@@ -7,6 +7,7 @@ import Navbar from "@/components/Navbar"
 import { ToastProvider } from "@/components/toast-provider"
 import { TokenHandler } from "@/components/TokenHandler"
 import { AuthProvider } from "@/components/auth-context"
+import { Analytics } from "@vercel/analytics/next"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,6 +39,7 @@ export default function RootLayout({
               <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-background/90">
                 <Navbar />
                 <main>{children}</main>
+                <Analytics />
               </div>
             </ToastProvider>
           </ThemeProvider>

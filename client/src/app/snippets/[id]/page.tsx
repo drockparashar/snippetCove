@@ -48,7 +48,7 @@ interface Snippet {
   tags: string[];
   upvotes: number;
   upvotedBy?: string[];
-  author?: { name?: string };
+  author?: { _id: string; name?: string };
   // Add other fields as needed based on your API response
 }
 
@@ -309,10 +309,15 @@ export default function SnippetDetail() {
                 <div>
                   <h4 className="text-sm font-medium text-muted-foreground mb-1">Added by</h4>
                   <div className="flex items-center gap-2">
-                    {/* <div className="w-8 h-8 rounded-full bg-secondary overflow-hidden">
-                      <img src="/api/placeholder/32/32" alt="User avatar" className="w-full h-full object-cover" />
-                    </div> */}
-                    <span className="font-medium">{snippet.author?.name || "Unknown"}</span>
+                    {snippet.author && snippet.author._id ? (
+                      <Link href={`/users/${snippet.author._id}`}>
+                        <span className="font-medium cursor-pointer text-primary hover:underline">
+                          {snippet.author?.name || "Unknown"}
+                        </span>
+                      </Link>
+                    ) : (
+                      <span className="font-medium">{snippet.author?.name || "Unknown"}</span>
+                    )}
                    </div>
                 </div>
               </div>

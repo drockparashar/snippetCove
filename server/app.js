@@ -9,6 +9,7 @@ import populate from "./populate.js";
 import passport from "passport";
 import "./controllers/passport.js";
 import dotenv from "dotenv";
+import usersRoutes from "./routes/users.js";
 
 dotenv.config();
 
@@ -31,6 +32,7 @@ app.use("/api/snippets", snippetRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/auth", githubAuthRoutes);
 app.use("/api/auth", checkAuthRoutes);
+app.use("/api/users", usersRoutes);
 app.use("/", populate);
 
 // Database
