@@ -6,12 +6,15 @@ import { Calendar, Github, Globe, MapPin, Share2, Twitter, UserPlus, Verified } 
 import Link from "next/link"
 import type { UserProfileData } from "@/types/user"
 import { formatNumber } from "@/lib/utils"
+import { useAuth } from "@/components/auth-context"
 
 interface ProfileHeaderProps {
   userData: UserProfileData
 }
 
 export function ProfileHeader({ userData }: ProfileHeaderProps) {
+  const { user } = useAuth()
+  const isOwnProfile = user?._id === userData._id
   const handleShare = async () => {
     if (navigator.share) {
       try {
@@ -112,10 +115,12 @@ export function ProfileHeader({ userData }: ProfileHeaderProps) {
 
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
-                <Button className="px-6">
-                  <UserPlus className="h-4 w-4 mr-2" />
-                  Follow
-                </Button>
+                {!isOwnProfile && (
+                  <Button className="px-6">
+                    <UserPlus className="h-4 w-4 mr-2" />
+                    Follow
+                  </Button>
+                )}
                 <Button variant="outline" onClick={handleShare} className="px-6">
                   <Share2 className="h-4 w-4 mr-2" />
                   Share
