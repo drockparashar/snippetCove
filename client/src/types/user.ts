@@ -49,4 +49,6 @@ export interface UserProfileData {
   languages: LanguageUsage[]
   activityData: ActivityData
   isFollowing?: boolean
+  followers: string[]
+  following: string[]
 }

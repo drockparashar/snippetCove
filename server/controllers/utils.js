@@ -2,6 +2,7 @@ import Snippet from "../models/Snippet.js";
 
 export async function buildUserProfile(user) {
   // Fetch all created snippets
+  console.log(user)
   const createdSnippets = await Snippet.find({ author: user._id });
 
   // Calculate stats
@@ -69,6 +70,8 @@ export async function buildUserProfile(user) {
     githubUsername: user.githubUsername || "",
     twitterUsername: user.twitterUsername || "",
     avatar: user.avatar || "",
+    followers:user.followers||[],
+    following:user.following||[],
     joinDate: user.createdAt,
     isVerified: !!user.isVerified,
     stats: {

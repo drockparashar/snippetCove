@@ -4,31 +4,37 @@ import { buildUserProfile } from "./utils.js";
 // GET /api/users/id/:id
 export const getUserById = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id).select("-password");
-    if (!user) {
+    const publicUserId = req.params.id;
+    const publicUser = await User.findById(publicUserId)
+
+    // console.log(publicUser);
+
+    if (!publicUser) {
       return res.status(404).json({ error: "User not found" });
     }
-    const profile = await buildUserProfile(user);
+
+    const profile = await buildUserProfile(publicUser);
     res.json(profile);
   } catch (err) {
     res.status(500).json({ error: "Server error" });
   }
 };
 
-// Follow a user
 export const followUser = async (req, res) => {
   try {
     const { userId, targetUserId } = req.body;
 
-    if (userId === targetUserId) {
-      return res.status(400).json({ message: "You cannot follow yourself." });
+    if (!userId || !targetUserId) {
+      return res
+        .status(400)
+        .json({ error: "User ID and Target User ID are required." });
     }
 
     const user = await User.findById(userId);
     const targetUser = await User.findById(targetUserId);
 
     if (!user || !targetUser) {
-      return res.status(404).json({ message: "User not found." });
+      return res.status(404).json({ error: "User or Target User not found." });
     }
 
     if (user.following.includes(targetUserId)) {
@@ -44,21 +50,26 @@ export const followUser = async (req, res) => {
     await targetUser.save();
 
     res.status(200).json({ message: "User followed successfully." });
-  } catch (error) {
-    res.status(500).json({ message: "An error occurred.", error });
+  } catch (err) {
+    res.status(500).json({ error: "Server error." });
   }
 };
 
-// Unfollow a user
 export const unfollowUser = async (req, res) => {
   try {
     const { userId, targetUserId } = req.body;
+
+    if (!userId || !targetUserId) {
+      return res
+        .status(400)
+        .json({ error: "User ID and Target User ID are required." });
+    }
 
     const user = await User.findById(userId);
     const targetUser = await User.findById(targetUserId);
 
     if (!user || !targetUser) {
-      return res.status(404).json({ message: "User not found." });
+      return res.status(404).json({ error: "User or Target User not found." });
     }
 
     if (!user.following.includes(targetUserId)) {
@@ -78,7 +89,7 @@ export const unfollowUser = async (req, res) => {
     await targetUser.save();
 
     res.status(200).json({ message: "User unfollowed successfully." });
-  } catch (error) {
-    res.status(500).json({ message: "An error occurred.", error });
+  } catch (err) {
+    res.status(500).json({ error: "Server error." });
   }
 };

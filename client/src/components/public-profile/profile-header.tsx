@@ -7,7 +7,7 @@ import Link from "next/link"
 import type { UserProfileData } from "@/types/user"
 import { formatNumber } from "@/lib/utils"
 import { useAuth } from "@/components/auth-context"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { BACKEND_URL } from "@/lib/backend"
 import { useToast } from "@/components/toast-provider"
 
@@ -18,8 +18,16 @@ interface ProfileHeaderProps {
 export function ProfileHeader({ userData }: ProfileHeaderProps) {
   const { user } = useAuth()
   const isOwnProfile = user?._id === userData._id
-  const [isFollowing, setIsFollowing] = useState(userData?.isFollowing || false)
+  const [isFollowing, setIsFollowing] = useState(false)
   const { showToast } = useToast()
+
+  useEffect(() => {
+    if (user) {
+      const isUserFollowing = Array.isArray(userData.followers) && userData.followers.includes(user._id)
+      setIsFollowing(isUserFollowing)
+    }
+    // console.log(userData)
+  }, [user, userData.followers])
 
   const handleShare = async () => {
     if (navigator.share) {
@@ -38,7 +46,10 @@ export function ProfileHeader({ userData }: ProfileHeaderProps) {
   }
 
   const handleFollow = async () => {
-    if (!user) return
+    if (!user) {
+      showToast("Please log in to follow users.", "info")
+      return
+    }
     try {
       const endpoint = isFollowing ? `${BACKEND_URL}/api/users/unfollow` : `${BACKEND_URL}/api/users/follow`
       const response = await fetch(endpoint, {
