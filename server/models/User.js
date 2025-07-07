@@ -8,6 +8,8 @@ const UserSchema = new Schema(
     githubId: { type: String },
     savedSnippets: [{ type: Schema.Types.ObjectId, ref: "Snippet" }],
     createdSnippets: [{ type: Schema.Types.ObjectId, ref: "Snippet" }],
+    followers:[{type:Schema.Types.ObjectId,ref:"User"}],
+    following:[{type:Schema.Types.ObjectId,ref:"User"}]
   },
   { timestamps: true }
 );

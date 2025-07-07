@@ -2,11 +2,14 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { Calendar, Github, Globe, MapPin, Share2, Twitter, UserPlus, Verified } from "lucide-react"
+import { Calendar, Github, Globe, MapPin, Share2, Twitter, Verified } from "lucide-react"
 import Link from "next/link"
 import type { UserProfileData } from "@/types/user"
 import { formatNumber } from "@/lib/utils"
 import { useAuth } from "@/components/auth-context"
+import { useState } from "react"
+import { BACKEND_URL } from "@/lib/backend"
+import { useToast } from "@/components/toast-provider"
 
 interface ProfileHeaderProps {
   userData: UserProfileData
@@ -15,6 +18,9 @@ interface ProfileHeaderProps {
 export function ProfileHeader({ userData }: ProfileHeaderProps) {
   const { user } = useAuth()
   const isOwnProfile = user?._id === userData._id
+  const [isFollowing, setIsFollowing] = useState(userData?.isFollowing || false)
+  const { showToast } = useToast()
+
   const handleShare = async () => {
     if (navigator.share) {
       try {
@@ -28,6 +34,33 @@ export function ProfileHeader({ userData }: ProfileHeaderProps) {
       }
     } else {
       await navigator.clipboard.writeText(window.location.href)
+    }
+  }
+
+  const handleFollow = async () => {
+    if (!user) return
+    try {
+      const endpoint = isFollowing ? `${BACKEND_URL}/api/users/unfollow` : `${BACKEND_URL}/api/users/follow`
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: user._id,
+          targetUserId: userData._id,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to update follow status")
+      }
+
+      setIsFollowing(!isFollowing)
+      showToast(`You have ${isFollowing ? "unfollowed" : "followed"} ${userData.name}.`, "success")
+    } catch (error) {
+      console.error("Error updating follow status:", error)
+      showToast("Failed to update follow status. Please try again.", "error")
     }
   }
 
@@ -116,9 +149,8 @@ export function ProfileHeader({ userData }: ProfileHeaderProps) {
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
                 {!isOwnProfile && (
-                  <Button className="px-6">
-                    <UserPlus className="h-4 w-4 mr-2" />
-                    Follow
+                  <Button onClick={handleFollow} className="px-6">
+                    {isFollowing ? "Unfollow" : "Follow"}
                   </Button>
                 )}
                 <Button variant="outline" onClick={handleShare} className="px-6">

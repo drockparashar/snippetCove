@@ -48,4 +48,5 @@ export interface UserProfileData {
   recentSnippets: Snippet[]
   languages: LanguageUsage[]
   activityData: ActivityData
+  isFollowing?: boolean
 }
