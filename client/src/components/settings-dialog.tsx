@@ -13,10 +13,6 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Separator } from "@/components/ui/separator"
-import { Switch } from "@/components/ui/switch"
-import { Github, Mail, Save, Trash2, User } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { BACKEND_URL } from "@/lib/backend"
 
@@ -77,7 +73,7 @@ export function SettingsDialog({ open, onOpenChange, user }: SettingsDialogProps
       } else {
         showToast("Failed to update profile.", "error");
       }
-    } catch (error) {
+    } catch {
       showToast("Error updating profile.", "error");
     } finally {
       setSaving(false);

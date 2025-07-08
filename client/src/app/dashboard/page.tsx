@@ -34,7 +34,7 @@ export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState("profile");
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [wasSettingsOpen, setWasSettingsOpen] = useState(false);
-  const [userData, setUserData] = useState(null);
+  const [, setUserData] = useState(null);
   const router = useRouter();
 
   useEffect(() => {
