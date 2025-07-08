@@ -18,7 +18,11 @@ const app = express();
 // Middleware
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL,
+    origin: [
+      "https://snippet-cove.vercel.app",
+      "https://snippetcove.onrender.com",
+      "http://localhost:3000"
+    ],
     credentials: true,
   })
 );
