@@ -50,6 +50,7 @@ export function ProfileHeader({ userData }: ProfileHeaderProps) {
       showToast("Please log in to follow users.", "info")
       return
     }
+
     try {
       const endpoint = isFollowing ? `${BACKEND_URL}/api/users/unfollow` : `${BACKEND_URL}/api/users/follow`
       const response = await fetch(endpoint, {
@@ -95,11 +96,16 @@ export function ProfileHeader({ userData }: ProfileHeaderProps) {
                 </AvatarFallback>
               </Avatar>
 
-              {/* Social Links as Icon Buttons */}
+              {/* Social Links as Clean Icon Buttons */}
               <div className="flex gap-2">
                 {userData.website && (
                   <Link href={userData.website} target="_blank" rel="noopener noreferrer">
-                    <Button variant="outline" size="icon" className="h-9 w-9">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="h-9 w-9 hover:bg-muted transition-colors bg-transparent"
+                      title="Visit website"
+                    >
                       <Globe className="h-4 w-4" />
                     </Button>
                   </Link>
@@ -110,18 +116,24 @@ export function ProfileHeader({ userData }: ProfileHeaderProps) {
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    <Button variant="outline" size="icon" className="h-9 w-9">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="h-9 w-9 hover:bg-muted transition-colors bg-transparent"
+                      title={`@${userData.githubUsername} on GitHub`}
+                    >
                       <Github className="h-4 w-4" />
                     </Button>
                   </Link>
                 )}
                 {userData.twitterUsername && (
-                  <Link
-                    href={`https://twitter.com/${userData.twitterUsername}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Button variant="outline" size="icon" className="h-9 w-9">
+                  <Link href={`https://x.com/${userData.twitterUsername}`} target="_blank" rel="noopener noreferrer">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="h-9 w-9 hover:bg-muted transition-colors bg-transparent"
+                      title={`@${userData.twitterUsername} on X`}
+                    >
                       <Twitter className="h-4 w-4" />
                     </Button>
                   </Link>
@@ -137,7 +149,7 @@ export function ProfileHeader({ userData }: ProfileHeaderProps) {
                   <h1 className="text-3xl font-bold tracking-tight">{userData.name}</h1>
                   {userData.isVerified && <Verified className="h-6 w-6 text-blue-500 fill-blue-500" />}
                 </div>
-                <p className="text-xl text-muted-foreground">@{userData.username}</p>
+                <p className="text-xl text-muted-foreground">@{userData.githubUsername}</p>
               </div>
 
               {/* Bio */}
@@ -164,7 +176,7 @@ export function ProfileHeader({ userData }: ProfileHeaderProps) {
                     {isFollowing ? "Unfollow" : "Follow"}
                   </Button>
                 )}
-                <Button variant="outline" onClick={handleShare} className="px-6">
+                <Button variant="outline" onClick={handleShare} className="px-6 bg-transparent">
                   <Share2 className="h-4 w-4 mr-2" />
                   Share
                 </Button>

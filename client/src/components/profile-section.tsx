@@ -8,10 +8,15 @@ import { BookMarked, Code2, Github, Mail, Settings, Star } from 'lucide-react'
 
 interface ProfileSectionProps {
   user: {
-    _id: string
-    name: string
-    email: string
-    githubId?: string
+   _id: string;
+  name: string;
+  email: string;
+  bio?: string;
+  location?: string;
+  website?: string;
+  githubUsername?: string;
+  twitterUsername?: string;
+  avatar?: string;
   }
   savedCount: number
   createdCount: number
@@ -30,7 +35,7 @@ export function ProfileSection({ user, savedCount, createdCount, totalUpvotes, o
         </div>
         <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-center sm:items-start">
           <Avatar className="h-16 w-16 sm:h-24 sm:w-24 border-4 border-background">
-            <AvatarImage src={`/api/placeholder/96/96`} alt={user.name || "User"} />
+            <AvatarImage src={user.avatar || "/placeholder.svg"} alt={user.name || "User"} />
             <AvatarFallback className="text-xl sm:text-2xl">{(user.name && user.name.charAt(0)) || "?"}</AvatarFallback>
           </Avatar>
           <div className="text-center sm:text-left">
@@ -39,10 +44,10 @@ export function ProfileSection({ user, savedCount, createdCount, totalUpvotes, o
               <Mail className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
               {user.email}
             </CardDescription>
-            {user.githubId && (
+            {user.githubUsername && (
               <CardDescription className="flex items-center justify-center sm:justify-start mt-1">
                 <Github className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-                GitHub Connected
+                {user.githubUsername}
               </CardDescription>
             )}
             <div className="flex justify-center sm:justify-start gap-3 sm:gap-4 mt-3 sm:mt-4">

@@ -5,6 +5,8 @@ import {
   getMe,
   saveSnippet,
   unsaveSnippet,
+  upload,
+  updateProfile,
 } from "../controllers/auth.js";
 import { auth } from "../middlewares/auth.js";
 
@@ -18,5 +20,8 @@ router.post("/login", login);
 router.get("/me", auth, getMe);
 router.post("/save-snippet", auth, saveSnippet);
 router.post("/unsave-snippet", auth, unsaveSnippet);
+
+//profile upload
+router.put("/update-profile",upload.single("avatar"),updateProfile);
 
 export default router;

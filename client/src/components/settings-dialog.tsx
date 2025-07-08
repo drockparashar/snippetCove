@@ -21,10 +21,15 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { BACKEND_URL } from "@/lib/backend"
 
 interface UserProfile {
+  _id: string;
   name: string;
   email: string;
-  githubId?: string;
-  // Add other fields as needed
+  bio?: string;
+  location?: string;
+  website?: string;
+  githubUsername?: string;
+  twitterUsername?: string;
+  avatar?: string;
 }
 
 interface SettingsDialogProps {
@@ -34,37 +39,50 @@ interface SettingsDialogProps {
 }
 
 export function SettingsDialog({ open, onOpenChange, user }: SettingsDialogProps) {
-  const [name, setName] = useState(user.name)
-  const [email, setEmail] = useState(user.email)
-  const [saving, setSaving] = useState(false)
+  const [name, setName] = useState(user.name);
+  const [email, setEmail] = useState(user.email);
+  const [bio, setBio] = useState(user.bio || "");
+  const [location, setLocation] = useState(user.location || "");
+  const [website, setWebsite] = useState(user.website || "");
+  const [githubUsername, setGithubUsername] = useState(user.githubUsername || "");
+  const [twitterUsername, setTwitterUsername] = useState(user.twitterUsername || "");
+  const [avatar, setAvatar] = useState<File | null>(null);
+  const [saving, setSaving] = useState(false);
   const { showToast } = useToast();
 
   const handleSave = async () => {
-    setSaving(true)
+    setSaving(true);
+
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("email", email);
+    formData.append("bio", bio);
+    formData.append("location", location);
+    formData.append("website", website);
+    formData.append("githubUsername", githubUsername);
+    formData.append("twitterUsername", twitterUsername);
+    if (avatar) formData.append("avatar", avatar);
+    formData.append("userId", user._id); // Add userId to the request body
 
     try {
-      // This would be the actual API call to update the user profile
       const res = await fetch(`${BACKEND_URL}/api/auth/update-profile`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ name, email }),
-      })
+        body: formData,
+      });
 
       if (res.ok) {
-        showToast("Profile updated!", "success")
-        onOpenChange(false)
+        showToast("Profile updated!", "success");
+        onOpenChange(false);
       } else {
-        showToast("Failed to update profile.", "error")
-        console.error("Failed to update profile")
+        showToast("Failed to update profile.", "error");
       }
     } catch (error) {
-      showToast("Error updating profile.", "error")
-      console.error("Error updating profile:", error)
+      showToast("Error updating profile.", "error");
     } finally {
-      setSaving(false)
+      setSaving(false);
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -76,191 +94,61 @@ export function SettingsDialog({ open, onOpenChange, user }: SettingsDialogProps
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs defaultValue="profile" className="mt-3 sm:mt-4">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="profile" className="text-xs sm:text-sm py-1 sm:py-2">
-              Profile
-            </TabsTrigger>
-            <TabsTrigger value="account" className="text-xs sm:text-sm py-1 sm:py-2">
-              Account
-            </TabsTrigger>
-              <TabsTrigger value="notifications" className="text-xs sm:text-sm py-1 sm:py-2">
-                Notifications
-              </TabsTrigger>
-            </TabsList>
+        <div className="space-y-4">
+          <div className="flex flex-col items-center gap-4">
+            <Avatar className="h-24 w-24 border-2 border-border">
+              <AvatarImage src={avatar ? URL.createObjectURL(avatar) : user.avatar || "/placeholder.svg"} alt={name} />
+              <AvatarFallback>{name.charAt(0)}</AvatarFallback>
+            </Avatar>
+            <Button variant="outline" size="sm" asChild>
+              <label htmlFor="avatar" className="cursor-pointer">
+                Change Avatar
+              </label>
+            </Button>
+            <Input
+              id="avatar"
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => setAvatar(e.target.files?.[0] || null)}
+            />
+          </div>
+          <div>
+            <Label htmlFor="name">Display Name</Label>
+            <Input id="name" value={name} onChange={(e) => setName(e.target.value)} />
+          </div>
+          <div>
+            <Label htmlFor="email">Email</Label>
+            <Input id="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+          </div>
+          <div>
+            <Label htmlFor="bio">Bio</Label>
+            <Input id="bio" value={bio} onChange={(e) => setBio(e.target.value)} />
+          </div>
+          <div>
+            <Label htmlFor="location">Location</Label>
+            <Input id="location" value={location} onChange={(e) => setLocation(e.target.value)} />
+          </div>
+          <div>
+            <Label htmlFor="website">Website</Label>
+            <Input id="website" value={website} onChange={(e) => setWebsite(e.target.value)} />
+          </div>
+          <div>
+            <Label htmlFor="githubUsername">GitHub Username</Label>
+            <Input id="githubUsername" value={githubUsername} onChange={(e) => setGithubUsername(e.target.value)} />
+          </div>
+          <div>
+            <Label htmlFor="twitterUsername">Twitter Username</Label>
+            <Input id="twitterUsername" value={twitterUsername} onChange={(e) => setTwitterUsername(e.target.value)} />
+          </div>
+        </div>
 
-          <TabsContent value="profile" className="space-y-3 sm:space-y-4 py-3 sm:py-4">
-            <div className="flex flex-col xs:flex-row items-center gap-3 sm:gap-4">
-              <Avatar className="h-12 w-12 sm:h-16 sm:w-16 border-2 border-border">
-                <AvatarImage src={`/api/placeholder/64/64`} alt={user.name} />
-                <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-              </Avatar>
-              <div className="text-center xs:text-left">
-                <Button variant="outline" size="sm" className="text-xs sm:text-sm h-7 sm:h-8">
-                  Change Avatar
-                </Button>
-                <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">JPG, PNG or GIF. 1MB max.</p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 gap-3 sm:gap-4">
-              <div className="space-y-1 sm:space-y-2">
-                <Label htmlFor="name" className="text-xs sm:text-sm">
-                  <User className="h-3 w-3 sm:h-4 sm:w-4 inline mr-1 sm:mr-2" />
-                  Display Name
-                </Label>
-                <Input
-                  id="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="text-xs sm:text-sm h-8 sm:h-9"
-                />
-              </div>
-
-              <div className="space-y-1 sm:space-y-2">
-                <Label htmlFor="email" className="text-xs sm:text-sm">
-                  <Mail className="h-3 w-3 sm:h-4 sm:w-4 inline mr-1 sm:mr-2" />
-                  Email
-                </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="text-xs sm:text-sm h-8 sm:h-9"
-                />
-              </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="account" className="space-y-3 sm:space-y-4 py-3 sm:py-4">
-            <div className="space-y-3 sm:space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2 sm:space-x-4">
-                  <Github className="h-4 w-4 sm:h-6 sm:w-6" />
-                  <div>
-                    <p className="text-xs sm:text-sm font-medium">GitHub</p>
-                    <p className="text-[10px] sm:text-xs text-muted-foreground">
-                      {user.githubId ? "Connected" : "Not connected"}
-                    </p>
-                  </div>
-                </div>
-                <Button
-                  variant={user.githubId ? "outline" : "default"}
-                  size="sm"
-                  className="text-xs sm:text-sm h-7 sm:h-8"
-                >
-                  {user.githubId ? "Disconnect" : "Connect"}
-                </Button>
-              </div>
-
-              <Separator />
-
-              <div>
-                <h3 className="text-sm sm:text-lg font-semibold mb-1 sm:mb-2">Password</h3>
-                <p className="text-[10px] sm:text-sm text-muted-foreground mb-2 sm:mb-4">
-                  Change your password or set one if you&apos;re using social login
-                </p>
-                <Button variant="outline" size="sm" className="text-xs sm:text-sm h-7 sm:h-8">
-                  Change Password
-                </Button>
-              </div>
-
-              <Separator />
-
-              <div>
-                <h3 className="text-sm sm:text-lg font-semibold text-destructive mb-1 sm:mb-2">Danger Zone</h3>
-                <p className="text-[10px] sm:text-sm text-muted-foreground mb-2 sm:mb-4">
-                  Permanently delete your account and all your data
-                </p>
-                <Button variant="destructive" size="sm" className="text-xs sm:text-sm h-7 sm:h-8">
-                  <Trash2 className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-                  Delete Account
-                </Button>
-              </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="notifications" className="space-y-3 sm:space-y-4 py-3 sm:py-4">
-            <div className="space-y-3 sm:space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs sm:text-sm font-medium">Email Notifications</p>
-                  <p className="text-[10px] sm:text-xs text-muted-foreground">
-                    Receive email notifications about your activity
-                  </p>
-                </div>
-                <Switch />
-              </div>
-
-              <Separator />
-
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs sm:text-sm font-medium">New Snippet Comments</p>
-                  <p className="text-[10px] sm:text-xs text-muted-foreground">
-                    Get notified when someone comments on your snippets
-                  </p>
-                </div>
-                <Switch defaultChecked />
-              </div>
-
-              <Separator />
-
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs sm:text-sm font-medium">Snippet Upvotes</p>
-                  <p className="text-[10px] sm:text-xs text-muted-foreground">
-                    Get notified when someone upvotes your snippets
-                  </p>
-                </div>
-                <Switch defaultChecked />
-              </div>
-
-              <Separator />
-
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs sm:text-sm font-medium">Marketing Emails</p>
-                  <p className="text-[10px] sm:text-xs text-muted-foreground">
-                    Receive emails about new features and updates
-                  </p>
-                </div>
-                <Switch />
-              </div>
-            </div>
-          </TabsContent>
-        </Tabs>
-
-        <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:gap-0 mt-3 sm:mt-4">
-          <Button
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-            size="sm"
-            className="w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9"
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={handleSave}
-            disabled={saving}
-            size="sm"
-            className="w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9"
-          >
-            {saving ? (
-              <>
-                <Save className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
-                Saving...
-              </>
-            ) : (
-              <>
-                <Save className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-                Save Changes
-              </>
-            )}
+        <DialogFooter>
+          <Button onClick={handleSave} disabled={saving}>
+            {saving ? "Saving..." : "Save Changes"}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

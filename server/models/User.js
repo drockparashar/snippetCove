@@ -6,10 +6,16 @@ const UserSchema = new Schema(
     email: { type: String, required: true, unique: true },
     password: { type: String, required: false },
     githubId: { type: String },
+    githubUsername: { type: String },
+    twitterUsername: { type: String },
+    profilePicture: { type: String },
+    bio: { type: String },
+    location: { type: String },
+    website: { type: String },
     savedSnippets: [{ type: Schema.Types.ObjectId, ref: "Snippet" }],
     createdSnippets: [{ type: Schema.Types.ObjectId, ref: "Snippet" }],
-    followers:[{type:Schema.Types.ObjectId,ref:"User"}],
-    following:[{type:Schema.Types.ObjectId,ref:"User"}]
+    followers: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    following: [{ type: Schema.Types.ObjectId, ref: "User" }],
   },
   { timestamps: true }
 );

@@ -41,6 +41,8 @@ export function ProfileHeader({
 }: ProfileHeaderProps) {
   const isOwnProfile = currentUser?._id === user._id
 
+  console.log("GitHub Username:", user.githubUsername);
+
   return (
     <Card>
       <CardContent className="p-4 sm:p-6">
@@ -54,7 +56,7 @@ export function ProfileHeader({
 
             <div className="text-center sm:text-left">
               <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">{user.name}</h1>
-              <p className="text-sm md:text-base text-muted-foreground">@{user.username}</p>
+              <p className="text-sm md:text-base text-muted-foreground">@{user.githubUsername}</p>
 
               {user.bio && <p className="mt-2 text-sm md:text-base text-foreground max-w-md">{user.bio}</p>}
 

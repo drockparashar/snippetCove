@@ -33,6 +33,8 @@ export default function DashboardPage() {
   const [createdSnippets, setCreatedSnippets] = useState<Snippet[]>([]);
   const [activeTab, setActiveTab] = useState("profile");
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [wasSettingsOpen, setWasSettingsOpen] = useState(false);
+  const [userData, setUserData] = useState(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -41,6 +43,18 @@ export default function DashboardPage() {
       return;
     }
     if (user) {
+      // Fetch user data
+      fetch(`${BACKEND_URL}/api/auth/me`, {
+        credentials: "include",
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          setUserData(data);
+        })
+        .catch((error) => {
+          console.error("Error fetching user data:", error);
+        });
+
       // Fetch saved snippets
       if (user.savedSnippets?.length) {
         const savedPromises = user.savedSnippets.map((id: string) =>
@@ -65,6 +79,13 @@ export default function DashboardPage() {
       }
     }
   }, [user, loading, router])
+
+  useEffect(() => {
+    if (wasSettingsOpen && settingsOpen === false) {
+      window.location.reload(); // Refresh the page to fetch updated data
+    }
+    setWasSettingsOpen(settingsOpen);
+  }, [settingsOpen]);
 
   // Calculate total upvotes for created snippets
   const totalUpvotes = createdSnippets.reduce((sum, s) => sum + (s.upvotes || 0), 0);

@@ -22,7 +22,7 @@ export default function UserProfilePage() {
 
         // Fetch user profile data by ID
         const response = await fetch(`${BACKEND_URL}/api/users/id/${params.id}`)
-        console.log(response)
+
 
         if (!response.ok) {
           if (response.status === 404) {

@@ -38,6 +38,7 @@ passport.use(
             name: profile.displayName || profile.username,
             email: email,
             githubId: profile.id,
+            githubUsername: profile.username, // Store GitHub username
             password: "", // No password for OAuth users
           });
           await user.save();
