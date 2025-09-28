@@ -488,9 +488,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Pranshu Parashar** - [@drockparashar](https://github.com/drockparashar)
 
-- 🌐 **Portfolio**: [Your Portfolio URL]
-- 📧 **Email**: [your.email@example.com]
-- 🐦 **Twitter**: [@yourtwitter]
+- 🌐 **Portfolio**: [Pranshu Parashar](https://pranshuparashar.vercel.app/)
+- 📧 **Email**: [pranshu007parashar@gmail.com]
+- 🐦 **Twitter**: [@PranshuParasha4]
 
 ---
 
