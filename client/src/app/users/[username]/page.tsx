@@ -13,15 +13,15 @@ export default function UserProfilePage() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!params?.id) return
+    if (!params?.username) return
 
     const fetchUserProfile = async () => {
       try {
         setLoading(true)
         setError(null)
 
-        // Fetch user profile data by ID
-        const response = await fetch(`${BACKEND_URL}/api/users/id/${params.id}`)
+        // Fetch user profile data by username
+        const response = await fetch(`${BACKEND_URL}/api/users/username/${params.username}`)
 
 
         if (!response.ok) {
@@ -42,7 +42,7 @@ export default function UserProfilePage() {
     }
 
     fetchUserProfile()
-  }, [params?.id])
+  }, [params?.username])
 
   return <PublicProfileLayout userData={userData} loading={loading} error={error} />
 }

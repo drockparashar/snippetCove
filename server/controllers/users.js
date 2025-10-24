@@ -5,7 +5,7 @@ import { buildUserProfile } from "./utils.js";
 export const getUserById = async (req, res) => {
   try {
     const publicUserId = req.params.id;
-    const publicUser = await User.findById(publicUserId)
+    const publicUser = await User.findById(publicUserId);
 
     // console.log(publicUser);
 
@@ -16,6 +16,31 @@ export const getUserById = async (req, res) => {
     const profile = await buildUserProfile(publicUser);
     res.json(profile);
   } catch (err) {
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+export const getUserByUsername = async (req, res) => {
+  try {
+    const username = req.params.username;
+
+    // Try to find user by githubUsername first, then by name (case-insensitive)
+    let publicUser = await User.findOne({
+      $or: [
+        { githubUsername: username },
+        { githubUsername: { $regex: new RegExp(`^${username}$`, "i") } },
+        { name: { $regex: new RegExp(`^${username}$`, "i") } },
+      ],
+    });
+
+    if (!publicUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const profile = await buildUserProfile(publicUser);
+    res.json(profile);
+  } catch (err) {
+    console.error("Error fetching user by username:", err);
     res.status(500).json({ error: "Server error" });
   }
 };

@@ -36,7 +36,7 @@ export const getSnippets = async (req, res) => {
     // Populate author field manually since aggregate doesn't support populate
     const populatedSnippets = await Snippet.populate(snippets, {
       path: "author",
-      select: "name",
+      select: "name githubUsername",
     });
     res.json(populatedSnippets);
   } catch (err) {
@@ -48,7 +48,7 @@ export const getSnippetById = async (req, res) => {
   try {
     const snippet = await Snippet.findById(req.params.id).populate(
       "author",
-      "name"
+      "name githubUsername"
     );
     if (!snippet) {
       return res.status(404).json({ error: "Snippet not found" });
@@ -68,7 +68,7 @@ export const searchSnippets = async (req, res) => {
     const regex = new RegExp(q, "i"); // case-insensitive
     const snippets = await Snippet.find({
       $or: [{ title: regex }, { tags: { $in: [regex] } }, { language: regex }],
-    }).populate("author", "name");
+    }).populate("author", "name githubUsername");
     res.json(snippets);
   } catch (err) {
     res.status(500).json({ error: "Error searching snippets" });

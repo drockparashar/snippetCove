@@ -21,7 +21,8 @@ app.use(
     origin: [
       "https://snippet-cove.vercel.app",
       "https://snippetcove.onrender.com",
-      "http://localhost:3000"
+      "http://localhost:3000",
+      "http://localhost:5173"
     ],
     credentials: true,
   })

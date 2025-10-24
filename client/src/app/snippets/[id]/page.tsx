@@ -48,7 +48,7 @@ interface Snippet {
   tags: string[];
   upvotes: number;
   upvotedBy?: string[];
-  author?: { _id: string; name?: string };
+  author?: { _id: string; name?: string; githubUsername?: string };
   // Add other fields as needed based on your API response
 }
 
@@ -309,8 +309,8 @@ export default function SnippetDetail() {
                 <div>
                   <h4 className="text-sm font-medium text-muted-foreground mb-1">Added by</h4>
                   <div className="flex items-center gap-2">
-                    {snippet.author && snippet.author._id ? (
-                      <Link href={`/users/${snippet.author._id}`}>
+                    {snippet.author && (snippet.author.githubUsername || snippet.author._id) ? (
+                      <Link href={snippet.author.githubUsername ? `/users/${snippet.author.githubUsername}` : `/users/id/${snippet.author._id}`}>
                         <span className="font-medium cursor-pointer text-primary hover:underline">
                           {snippet.author?.name || "Unknown"}
                         </span>

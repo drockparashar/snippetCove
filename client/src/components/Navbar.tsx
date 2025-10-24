@@ -28,12 +28,12 @@ export default function Navbar() {
             <Image 
               src="/favicon.png" 
               alt="SnipCove Logo" 
-              width={70} 
-              height={70} 
+              width={30} 
+              height={30} 
               className="rounded-md"
               priority
             />
-            <span>SnipCove</span>
+            <span>Snippet Cove</span>
           </Link>
 
           {/* Desktop Nav */}
