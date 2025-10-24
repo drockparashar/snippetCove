@@ -20,8 +20,18 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "SnipCove - Developer Code Snippets",
+  title: "Snippet Cove",
   description: "A community-driven platform for developers to save, share, and discover clean, reusable code snippets",
+  icons: {
+    icon: [
+      {
+        url: "/favicon.png",
+        type: "image/png",
+      },
+    ],
+    shortcut: "/favicon.png",
+    apple: "/favicon.png",
+  },
 }
 
 export default function RootLayout({

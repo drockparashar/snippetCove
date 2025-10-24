@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { ThemeToggle } from "@/components/ThemeToggle"
 import { Button } from "@/components/ui/button"
@@ -23,8 +24,15 @@ export default function Navbar() {
       <div className="container mx-auto px-4">
         <div className="flex items-center h-16 justify-end w-full">
           <Link href="/" className="flex items-center gap-2 font-semibold text-lg mr-auto">
-            {/* Logo or Icon */}
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" className="text-primary"><rect width="24" height="24" rx="6" fill="currentColor"/></svg>
+            {/* Logo */}
+            <Image 
+              src="/favicon.png" 
+              alt="SnipCove Logo" 
+              width={70} 
+              height={70} 
+              className="rounded-md"
+              priority
+            />
             <span>SnipCove</span>
           </Link>
 
